@@ -3,8 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>无人机手势控制系统 - 项目主页</title>
+    <title>猎枭一号 - ESP32-S3 手甲无人机项目</title>
     <style>
+        :root {
+            --primary: #2a4365;
+            --secondary: #3182ce;
+            --accent: #63b3ed;
+            --light: #ebf8ff;
+            --dark: #1a365d;
+            --text: #2d3748;
+            --text-light: #718096;
+            --success: #38a169;
+            --warning: #d69e2e;
+        }
+        
         * {
             margin: 0;
             padding: 0;
@@ -13,8 +25,8 @@
         }
         
         body {
-            background-color: #0a192f;
-            color: #e6f1ff;
+            background-color: #f7fafc;
+            color: var(--text);
             line-height: 1.6;
         }
         
@@ -26,12 +38,12 @@
         
         /* 导航栏样式 */
         header {
-            background-color: rgba(10, 25, 47, 0.9);
+            background-color: var(--primary);
             position: fixed;
             width: 100%;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
         
         nav {
@@ -44,7 +56,7 @@
         .logo {
             font-size: 24px;
             font-weight: bold;
-            color: #64ffda;
+            color: white;
         }
         
         .nav-links {
@@ -57,14 +69,14 @@
         }
         
         .nav-links a {
-            color: #ccd6f6;
+            color: white;
             text-decoration: none;
             font-size: 16px;
             transition: color 0.3s;
         }
         
         .nav-links a:hover {
-            color: #64ffda;
+            color: var(--accent);
         }
         
         /* 英雄区域样式 */
@@ -73,6 +85,8 @@
             display: flex;
             align-items: center;
             padding-top: 80px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
         }
         
         .hero-content {
@@ -82,34 +96,34 @@
         .hero h1 {
             font-size: 3.5rem;
             margin-bottom: 20px;
-            background: linear-gradient(135deg, #64ffda 0%, #4db5ff 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
         }
         
         .hero p {
             font-size: 1.2rem;
             margin-bottom: 30px;
-            color: #8892b0;
+            opacity: 0.9;
         }
         
         .btn {
             display: inline-block;
             padding: 12px 28px;
-            background-color: transparent;
-            color: #64ffda;
-            border: 1px solid #64ffda;
+            background-color: var(--accent);
+            color: white;
+            border: none;
             border-radius: 4px;
             text-decoration: none;
             font-size: 16px;
+            font-weight: bold;
             transition: all 0.3s;
+            cursor: pointer;
         }
         
         .btn:hover {
-            background-color: rgba(100, 255, 218, 0.1);
+            background-color: #4299e1;
+            transform: translateY(-2px);
         }
         
-        /* 项目介绍区域 */
+        /* 通用区域样式 */
         .section {
             padding: 100px 0;
         }
@@ -118,130 +132,202 @@
             font-size: 2.5rem;
             text-align: center;
             margin-bottom: 60px;
-            color: #ccd6f6;
+            color: var(--primary);
+            position: relative;
         }
         
-        .section-title span {
-            color: #64ffda;
+        .section-title:after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 4px;
+            background-color: var(--accent);
+            margin: 15px auto;
+            border-radius: 2px;
         }
         
-        .features {
+        /* 项目目标区域 */
+        .goals {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+        
+        .goal-card {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+        }
+        
+        .goal-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .goal-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--secondary);
+        }
+        
+        .goal-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        
+        /* 硬件清单区域 */
+        .hardware-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .hardware-table th {
+            background-color: var(--primary);
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+        
+        .hardware-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .hardware-table tr:nth-child(even) {
+            background-color: #f7fafc;
+        }
+        
+        .hardware-table tr:hover {
+            background-color: #edf2f7;
+        }
+        
+        /* 系统框架区域 */
+        .system-overview {
+            background-color: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .flow-diagram {
+            text-align: center;
+            margin: 40px 0;
+        }
+        
+        .flow-step {
+            display: inline-block;
+            margin: 0 20px;
+            text-align: center;
+            vertical-align: top;
+            width: 150px;
+        }
+        
+        .flow-icon {
+            width: 80px;
+            height: 80px;
+            background-color: var(--light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 2rem;
+            color: var(--secondary);
+        }
+        
+        .flow-arrow {
+            display: inline-block;
+            font-size: 2rem;
+            color: var(--accent);
+            margin: 30px 10px 0;
+        }
+        
+        /* 功能模块区域 */
+        .modules {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 30px;
         }
         
-        .feature-card {
-            background-color: #112240;
+        .module-card {
+            background-color: white;
             padding: 30px;
-            border-radius: 5px;
-            transition: transform 0.3s;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
         }
         
-        .feature-card:hover {
-            transform: translateY(-10px);
-        }
-        
-        .feature-icon {
-            font-size: 2.5rem;
-            color: #64ffda;
-            margin-bottom: 20px;
-        }
-        
-        .feature-card h3 {
+        .module-card h3 {
             font-size: 1.5rem;
             margin-bottom: 15px;
-            color: #ccd6f6;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
         }
         
-        .feature-card p {
-            color: #8892b0;
-        }
-        
-        /* 团队成员区域 */
-        .team {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-        }
-        
-        .team-member {
-            text-align: center;
-            background-color: #112240;
-            padding: 30px;
-            border-radius: 5px;
-        }
-        
-        .member-avatar {
-            width: 120px;
-            height: 120px;
+        .module-card h3:before {
+            content: '';
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background-color: var(--accent);
             border-radius: 50%;
-            margin: 0 auto 20px;
-            background-color: #233554;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-            color: #64ffda;
+            margin-right: 10px;
         }
         
-        .member-name {
-            font-size: 1.3rem;
-            margin-bottom: 10px;
-            color: #ccd6f6;
-        }
-        
-        .member-role {
-            color: #64ffda;
-            margin-bottom: 15px;
-            font-weight: 500;
-        }
-        
-        /* 技术栈区域 */
-        .tech-stack {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px;
-        }
-        
-        .tech-item {
-            background-color: #112240;
-            padding: 15px 25px;
-            border-radius: 30px;
-            color: #64ffda;
-            border: 1px solid #233554;
-        }
-        
-        /* 演示区域 */
-        .demo {
-            text-align: center;
-        }
-        
-        .demo-video {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: #112240;
-            border-radius: 10px;
+        /* 预算区域 */
+        .budget-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
         
-        .demo-placeholder {
-            height: 400px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #0a192f 0%, #112240 100%);
-            color: #64ffda;
-            font-size: 1.2rem;
+        .budget-table th {
+            background-color: var(--primary);
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+        
+        .budget-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .budget-table tr:nth-child(even) {
+            background-color: #f7fafc;
+        }
+        
+        .budget-total {
+            font-weight: bold;
+            background-color: var(--light) !important;
+            color: var(--primary);
+        }
+        
+        /* 代码展示区域 */
+        .code-block {
+            background-color: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            margin: 20px 0;
         }
         
         /* 页脚样式 */
         footer {
-            background-color: #0a192f;
+            background-color: var(--dark);
+            color: white;
             padding: 50px 0 30px;
-            border-top: 1px solid #233554;
         }
         
         .footer-content {
@@ -258,7 +344,7 @@
         }
         
         .footer-section h3 {
-            color: #ccd6f6;
+            color: var(--accent);
             margin-bottom: 20px;
             font-size: 1.2rem;
         }
@@ -272,20 +358,20 @@
         }
         
         .footer-links a {
-            color: #8892b0;
+            color: #cbd5e0;
             text-decoration: none;
             transition: color 0.3s;
         }
         
         .footer-links a:hover {
-            color: #64ffda;
+            color: var(--accent);
         }
         
         .copyright {
             text-align: center;
             padding-top: 30px;
-            border-top: 1px solid #233554;
-            color: #8892b0;
+            border-top: 1px solid #4a5568;
+            color: #a0aec0;
             font-size: 0.9rem;
         }
         
@@ -302,6 +388,17 @@
             .section-title {
                 font-size: 2rem;
             }
+            
+            .flow-step {
+                display: block;
+                margin: 20px auto;
+            }
+            
+            .flow-arrow {
+                display: block;
+                margin: 10px auto;
+                transform: rotate(90deg);
+            }
         }
     </style>
 </head>
@@ -310,14 +407,14 @@
     <header>
         <div class="container">
             <nav>
-                <div class="logo">GestureDrone</div>
+                <div class="logo">猎枭一号</div>
                 <ul class="nav-links">
-                    <li><a href="#home">首页</a></li>
-                    <li><a href="#about">项目介绍</a></li>
-                    <li><a href="#team">团队成员</a></li>
-                    <li><a href="#tech">技术栈</a></li>
-                    <li><a href="#demo">项目演示</a></li>
-                    <li><a href="#contact">联系我们</a></li>
+                    <li><a href="#project">项目概述</a></li>
+                    <li><a href="#hardware">硬件清单</a></li>
+                    <li><a href="#system">系统框架</a></li>
+                    <li><a href="#modules">功能模块</a></li>
+                    <li><a href="#budget">预算与结构</a></li>
+                    <li><a href="#resources">资源与流程</a></li>
                 </ul>
             </nav>
         </div>
@@ -327,132 +424,345 @@
     <section class="hero" id="home">
         <div class="container">
             <div class="hero-content">
-                <h1>手势控制无人机系统</h1>
-                <p>基于计算机视觉与Arduino的智能无人机控制系统，通过手势识别实现无人机的直观操控，为人机交互开辟新的可能性。</p>
-                <a href="#demo" class="btn">查看演示</a>
+                <h1>猎枭一号</h1>
+                <h2>ESP32-S3 手甲无人机完整方案</h2>
+                <p>基于ESP32-S3的智能手甲无人机系统，集手势识别、AI计算与无人机控制于一体，实现从手甲到无人机的无缝变形与操控。</p>
+                <a href="#project" class="btn">了解项目详情</a>
             </div>
         </div>
     </section>
 
-    <!-- 项目介绍 -->
-    <section class="section" id="about">
+    <!-- 项目目标 -->
+    <section class="section" id="project">
         <div class="container">
-            <h2 class="section-title">项目<span>介绍</span></h2>
-            <div class="features">
-                <div class="feature-card">
-                    <div class="feature-icon">👋</div>
+            <h2 class="section-title">项目目标</h2>
+            <div class="goals">
+                <div class="goal-card">
+                    <div class="goal-icon">🚁</div>
+                    <h3>变形设计</h3>
+                    <p>无人机可变形为手甲佩戴，实现便携与功能的完美结合。</p>
+                </div>
+                <div class="goal-card">
+                    <div class="goal-icon">👋</div>
                     <h3>手势识别</h3>
-                    <p>使用MediaPipe和OpenCV实现精准的手部关键点检测，能够识别多种控制手势，如握拳、手掌张开等。</p>
+                    <p>摄像头采集手部图像，识别握拳（就绪）与张开五指（起飞）手势。</p>
                 </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🚁</div>
-                    <h3>无人机控制</h3>
-                    <p>基于Arduino的自制飞控系统，通过PID算法实现无人机稳定飞行，响应手势指令完成起飞、降落等操作。</p>
+                <div class="goal-card">
+                    <div class="goal-icon">📹</div>
+                    <h3>实时传输</h3>
+                    <p>飞行期间摄像头视频实时传输至电脑，实现远程监控。</p>
                 </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🔗</div>
-                    <h3>实时通信</h3>
-                    <p>建立电脑与Arduino之间的稳定通信链路，确保手势指令能够实时传输并控制无人机动作。</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 团队成员 -->
-    <section class="section" id="team">
-        <div class="container">
-            <h2 class="section-title">团队<span>成员</span></h2>
-            <div class="team">
-                <div class="team-member">
-                    <div class="member-avatar">👨‍💻</div>
-                    <h3 class="member-name">刘一鸣</h3>
-                    <p class="member-role">软件工程师</p>
-                    <p>负责手势识别算法开发与系统集成</p>
-                </div>
-                <div class="team-member">
-                    <div class="member-avatar">🔧</div>
-                    <h3 class="member-name">王冠博</h3>
-                    <p class="member-role">嵌入式系统工程师</p>
-                    <p>负责无人机飞控系统与硬件集成</p>
-                </div>
-                <div class="team-member">
-                    <div class="member-avatar">📐</div>
-                    <h3 class="member-name">王润松</h3>
-                    <p class="member-role">机械结构工程师</p>
-                    <p>负责无人机机架设计与3D打印</p>
-                </div>
-                <div class="team-member">
-                    <div class="member-avatar">⚡</div>
-                    <h3 class="member-name">宋政泽</h3>
-                    <p class="member-role">材料部件采购主管</p>
-                    <p>负责材料部件的采购</p>
+                <div class="goal-card">
+                    <div class="goal-icon">🧠</div>
+                    <h3>AI集成</h3>
+                    <p>全部使用ESP32-S3，无需Arduino，充分利用其强大算力与AI能力。</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- 技术栈 -->
-    <section class="section" id="tech">
+    <!-- 硬件清单 -->
+    <section class="section" id="hardware">
         <div class="container">
-            <h2 class="section-title">技术<span>栈</span></h2>
-            <div class="tech-stack">
-                <div class="tech-item">Python</div>
-                <div class="tech-item">OpenCV</div>
-                <div class="tech-item">MediaPipe</div>
-                <div class="tech-item">Arduino</div>
-                <div class="tech-item">C++</div>
-                <div class="tech-item">PID控制</div>
-                <div class="tech-item">3D建模</div>
-                <div class="tech-item">电路设计</div>
-            </div>
+            <h2 class="section-title">主要硬件清单</h2>
+            <table class="hardware-table">
+                <thead>
+                    <tr>
+                        <th>名称</th>
+                        <th>推荐型号</th>
+                        <th>功能说明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>主控</td>
+                        <td>ESP32-S3开发板</td>
+                        <td>支持AI加速，算力远超普通ESP32及Arduino</td>
+                    </tr>
+                    <tr>
+                        <td>摄像头模块</td>
+                        <td>OV2640 (M5系列摄像头或兼容)</td>
+                        <td>适配ESP32摄像头应用</td>
+                    </tr>
+                    <tr>
+                        <td>电机</td>
+                        <td>8520无刷电机×4</td>
+                        <td>轻型四轴机常用</td>
+                    </tr>
+                    <tr>
+                        <td>电调 ESC</td>
+                        <td>迷你无刷ESC×4</td>
+                        <td>控制电机</td>
+                    </tr>
+                    <tr>
+                        <td>供电</td>
+                        <td>3.7V锂电 550mAh</td>
+                        <td>小型飞行器电池</td>
+                    </tr>
+                    <tr>
+                        <td>舵机</td>
+                        <td>SG90微型舵机×2</td>
+                        <td>展开结构用</td>
+                    </tr>
+                    <tr>
+                        <td>机体结构</td>
+                        <td>3D打印/碳纤/软质材料</td>
+                        <td>手甲+可展开型四轴机架</td>
+                    </tr>
+                    <tr>
+                        <td>周边材料</td>
+                        <td>魔术贴/磁扣等</td>
+                        <td>固定和佩戴</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </section>
 
-    <!-- 项目演示 -->
-    <section class="section" id="demo">
+    <!-- 系统框架 -->
+    <section class="section" id="system">
         <div class="container">
-            <h2 class="section-title">项目<span>演示</span></h2>
-            <div class="demo">
-                <div class="demo-video">
-                    <div class="demo-placeholder">
-                        <div>
-                            <p>🚁 无人机手势控制演示视频</p>
-                            <p style="font-size: 0.9rem; margin-top: 10px; color: #8892b0;">实际项目演示将在此处展示</p>
-                        </div>
+            <h2 class="section-title">系统框架总览</h2>
+            <div class="system-overview">
+                <div class="flow-diagram">
+                    <div class="flow-step">
+                        <div class="flow-icon">🖐️</div>
+                        <h4>手甲形态</h4>
+                        <p>摄像头检测手部手势</p>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">
+                        <div class="flow-icon">🚁</div>
+                        <h4>无人机展开</h4>
+                        <p>手势控制展开过程</p>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">
+                        <div class="flow-icon">👊</div>
+                        <h4>手势识别</h4>
+                        <p>握拳→准备<br>张开五指→起飞</p>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">
+                        <div class="flow-icon">📡</div>
+                        <h4>ESP32-S3控制</h4>
+                        <p>控制起飞与电机</p>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">
+                        <div class="flow-icon">📹</div>
+                        <h4>视频传输</h4>
+                        <p>飞行中实时传输视频</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
+    <!-- 功能模块 -->
+    <section class="section" id="modules">
+        <div class="container">
+            <h2 class="section-title">功能模块及实现步骤</h2>
+            <div class="modules">
+                <div class="module-card">
+                    <h3>机体结构设计</h3>
+                    <p><strong>收纳式四轴结构：</strong>手甲为主板，四轴臂折叠后与手背贴合。</p>
+                    <p><strong>舵机/机械按钮：</strong>用于展开机臂，可软件自动控制或手动触发。</p>
+                    <p><strong>摄像头位置：</strong>建议放在手背/掌心上方，能完整拍摄手部动作。</p>
+                </div>
+                <div class="module-card">
+                    <h3>摄像头手势识别</h3>
+                    <p><strong>方案一：本地AI识别</strong></p>
+                    <p>利用ESP32-S3的AI协处理单元，部署轻量型手势识别模型（TFLite Micro、ESP-DL框架）。</p>
+                    <p><strong>方案二：图像上传至PC识别（入门版）</strong></p>
+                    <p>摄像头拍照通过无线传到电脑，由PC端OpenCV识别，再通过WiFi控制无人机。</p>
+                </div>
+                <div class="module-card">
+                    <h3>飞控与起飞流程</h3>
+                    <p>ESP32-S3控制飞行器四轴基本动作：</p>
+                    <ul>
+                        <li>IO口PWM直接驱动ESC（需4路PWM，S3支持）</li>
+                        <li>起飞/降落流程由手势识别逻辑决定</li>
+                        <li>舵机用于展开臂，由S3 PWM口控制</li>
+                    </ul>
+                </div>
+                <div class="module-card">
+                    <h3>摄像头实时视频传输</h3>
+                    <p>ESP32-S3本地MJPEG/WebServer：</p>
+                    <ul>
+                        <li>摄像头模块推流至Web服务器</li>
+                        <li>PC端同局域网用浏览器访问</li>
+                        <li>飞行期间持续采集并传输</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 预算与结构 -->
+    <section class="section" id="budget">
+        <div class="container">
+            <h2 class="section-title">预算与结构设计</h2>
+            <h3 style="margin-bottom: 20px; color: var(--primary);">零件清单与参考价格</h3>
+            <table class="budget-table">
+                <thead>
+                    <tr>
+                        <th>零件名称</th>
+                        <th>推荐型号/规格</th>
+                        <th>单价 (RMB)</th>
+                        <th>数量</th>
+                        <th>总价 (RMB)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>ESP32-S3开发板</td>
+                        <td>M5Stack ESP32-S3（带摄像头）</td>
+                        <td>¥89</td>
+                        <td>1</td>
+                        <td>¥89</td>
+                    </tr>
+                    <tr>
+                        <td>无刷电机</td>
+                        <td>8520（4mm轴、四轴专用）</td>
+                        <td>¥19</td>
+                        <td>4</td>
+                        <td>¥76</td>
+                    </tr>
+                    <tr>
+                        <td>电子调速器 ESC</td>
+                        <td>迷你无刷ESC（1S，3-6A）</td>
+                        <td>¥28</td>
+                        <td>4</td>
+                        <td>¥112</td>
+                    </tr>
+                    <tr>
+                        <td>锂电池</td>
+                        <td>3.7V 550mAh（聚合物）</td>
+                        <td>¥26</td>
+                        <td>1</td>
+                        <td>¥26</td>
+                    </tr>
+                    <tr>
+                        <td>舵机（臂折叠）</td>
+                        <td>SG90微型舵机</td>
+                        <td>¥15</td>
+                        <td>2</td>
+                        <td>¥30</td>
+                    </tr>
+                    <tr>
+                        <td>机架/定制外壳</td>
+                        <td>3D打印or碳纤</td>
+                        <td>¥40</td>
+                        <td>1</td>
+                        <td>¥40</td>
+                    </tr>
+                    <tr>
+                        <td>魔术贴/磁扣螺丝</td>
+                        <td>杂项配件</td>
+                        <td>¥10</td>
+                        <td>1套</td>
+                        <td>¥10</td>
+                    </tr>
+                    <tr class="budget-total">
+                        <td colspan="4" style="text-align: right;">总价估算（基础版）：</td>
+                        <td>¥383</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div style="margin-top: 40px;">
+                <h3 style="margin-bottom: 20px; color: var(--primary);">结构蓝图设计</h3>
+                <div class="module-card">
+                    <h4>结构布局</h4>
+                    <p><strong>手甲形态：</strong>机臂收起贴合手背，摄像头朝下或正面拍摄手部动作。</p>
+                    <p><strong>无人机形态：</strong>四轴臂弹出，呈十字布局，主板+电池+摄像头居中。</p>
+                    <p><strong>佩戴设计：</strong>底部使用魔术贴或可调卡扣，确保稳固佩戴。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 资源与流程 -->
+    <section class="section" id="resources">
+        <div class="container">
+            <h2 class="section-title">开发资源与流程</h2>
+            <div class="modules">
+                <div class="module-card">
+                    <h3>程序开发流程</h3>
+                    <p><strong>手势识别代码（伪代码）：</strong></p>
+                    <div class="code-block">
+                        // 初始化摄像头与手势识别模型<br>
+                        initCamera();<br>
+                        initGestureModel();<br><br>
+                        
+                        // 循环识别<br>
+                        loop {<br>
+                        &nbsp;&nbsp;frame = cameraCapture();<br>
+                        &nbsp;&nbsp;gesture = modelPredict(frame);<br>
+                        &nbsp;&nbsp;if (gesture == "fist") setReadyState();<br>
+                        &nbsp;&nbsp;else if (gesture == "open_hand" && isReady()) {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;unfoldArms();<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;startMotors();<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;startVideoStream();<br>
+                        &nbsp;&nbsp;}<br>
+                        }
+                    </div>
+                </div>
+                <div class="module-card">
+                    <h3>部署和控制流程</h3>
+                    <ol style="padding-left: 20px;">
+                        <li>初始，手甲模式：机臂收起，主板+摄像头激活，佩戴于手背。</li>
+                        <li>摄像头持续扫描手背手势，AI本地识别握拳（准备）/张开五指（起飞）。</li>
+                        <li>握拳：舵机带动臂准备展开，进入"就绪"。</li>
+                        <li>张开五指：四轴臂全部弹开，电调驱动电机启动，进入飞行状态。</li>
+                        <li>飞行时，摄像头视频流通过WiFi推送到电脑。</li>
+                        <li>降落或熄火后，机臂收起恢复手甲佩戴状态。</li>
+                    </ol>
+                </div>
+                <div class="module-card">
+                    <h3>参考资源</h3>
+                    <ul style="padding-left: 20px;">
+                        <li>ESP32-S3官方文档与AI手势识别教程</li>
+                        <li>M5Stack ESP32-S3摄像头模块文档</li>
+                        <li>视频流WebServer、ESP32多路PWM驱动ESC代码</li>
+                        <li>开源手势AI模型训练资料：leapgestrecog数据集</li>
+                        <li>舵机/电调驱动PWM参考</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- 页脚 -->
-    <footer id="contact">
+    <footer>
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
-                    <h3>GestureDrone</h3>
-                    <p>基于手势识别的智能无人机控制系统，探索人机交互的新边界。</p>
+                    <h3>猎枭一号</h3>
+                    <p>ESP32-S3 手甲无人机完整方案</p>
                 </div>
                 <div class="footer-section">
-                    <h3>快速链接</h3>
+                    <h3>项目链接</h3>
                     <ul class="footer-links">
-                        <li><a href="#home">首页</a></li>
-                        <li><a href="#about">项目介绍</a></li>
-                        <li><a href="#team">团队成员</a></li>
-                        <li><a href="#demo">项目演示</a></li>
+                        <li><a href="#project">项目概述</a></li>
+                        <li><a href="#hardware">硬件清单</a></li>
+                        <li><a href="#system">系统框架</a></li>
+                        <li><a href="#modules">功能模块</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
-                    <h3>联系我们</h3>
+                    <h3>技术资源</h3>
                     <ul class="footer-links">
-                        <li>邮箱: contact@gesturedrone.com</li>
-                        <li>电话: +86 138 0013 8000</li>
-                        <li>地址: 某大学计算机科学与技术学院</li>
+                        <li><a href="#">ESP32-S3官方文档</a></li>
+                        <li><a href="#">ESP-DL AI库</a></li>
+                        <li><a href="#">手势识别数据集</a></li>
+                        <li><a href="#">3D打印资源</a></li>
                     </ul>
                 </div>
             </div>
             <div class="copyright">
-                <p>&copy; 2023 GestureDrone 项目小组. 保留所有权利.</p>
+                <p>&copy; 2023 猎枭一号项目小组. 保留所有权利.</p>
             </div>
         </div>
     </footer>
@@ -477,12 +787,11 @@
         window.addEventListener('scroll', function() {
             const header = document.querySelector('header');
             if (window.scrollY > 50) {
-                header.style.backgroundColor = 'rgba(10, 25, 47, 0.95)';
+                header.style.backgroundColor = 'rgba(42, 67, 101, 0.95)';
             } else {
-                header.style.backgroundColor = 'rgba(10, 25, 47, 0.9)';
+                header.style.backgroundColor = 'var(--primary)';
             }
         });
     </script>
 </body>
 </html>
-
