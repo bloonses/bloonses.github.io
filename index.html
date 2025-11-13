@@ -79,6 +79,47 @@
             color: var(--accent);
         }
         
+        /* 快捷目录样式 */
+        .quick-nav {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            padding: 15px;
+            z-index: 999;
+            max-width: 180px;
+        }
+        
+        .quick-nav-content h4 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+        
+        .quick-nav ul {
+            list-style: none;
+        }
+        
+        .quick-nav li {
+            margin-bottom: 8px;
+        }
+        
+        .quick-nav a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+            display: block;
+            padding: 3px 0;
+        }
+        
+        .quick-nav a:hover {
+            color: var(--secondary);
+        }
+        
         /* 英雄区域样式 */
         .hero {
             height: 100vh;
@@ -280,6 +321,74 @@
             margin-right: 10px;
         }
         
+        /* 团队成员样式 */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .team-member {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s;
+        }
+        
+        .team-member:hover {
+            transform: translateY(-5px);
+        }
+        
+        .member-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+        }
+        
+        .member-name {
+            font-size: 1.4rem;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+        
+        .member-role {
+            color: var(--secondary);
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+        
+        .member-desc {
+            color: var(--text-light);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        .member-skills {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .skill-tag {
+            background: var(--light);
+            color: var(--secondary);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
         /* 预算区域 */
         .budget-table {
             width: 100%;
@@ -376,6 +485,12 @@
         }
         
         /* 响应式设计 */
+        @media (max-width: 1024px) {
+            .quick-nav {
+                display: none;
+            }
+        }
+        
         @media (max-width: 768px) {
             .nav-links {
                 display: none;
@@ -399,10 +514,30 @@
                 margin: 10px auto;
                 transform: rotate(90deg);
             }
+            
+            .team-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- 快捷目录 -->
+    <div class="quick-nav">
+        <div class="quick-nav-content">
+            <h4>快速导航</h4>
+            <ul>
+                <li><a href="#project">项目目标</a></li>
+                <li><a href="#hardware">硬件清单</a></li>
+                <li><a href="#system">系统框架</a></li>
+                <li><a href="#modules">功能模块</a></li>
+                <li><a href="#team">团队成员</a></li>
+                <li><a href="#budget">预算结构</a></li>
+                <li><a href="#resources">开发资源</a></li>
+            </ul>
+        </div>
+    </div>
+
     <!-- 导航栏 -->
     <header>
         <div class="container">
@@ -413,8 +548,9 @@
                     <li><a href="#hardware">硬件清单</a></li>
                     <li><a href="#system">系统框架</a></li>
                     <li><a href="#modules">功能模块</a></li>
-                    <li><a href="#budget">预算与结构</a></li>
-                    <li><a href="#resources">资源与流程</a></li>
+                    <li><a href="#team">团队成员</a></li>
+                    <li><a href="#budget">预算结构</a></li>
+                    <li><a href="#resources">开发资源</a></li>
                 </ul>
             </nav>
         </div>
@@ -594,6 +730,70 @@
                         <li>PC端同局域网用浏览器访问</li>
                         <li>飞行期间持续采集并传输</li>
                     </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 团队成员 -->
+    <section class="section" id="team">
+        <div class="container">
+            <h2 class="section-title">团队成员</h2>
+            <div class="team-grid">
+                <div class="team-member">
+                    <div class="member-avatar">
+                        <span>👨‍💻</span>
+                    </div>
+                    <h3 class="member-name">张明</h3>
+                    <p class="member-role">项目组长 & AI算法工程师</p>
+                    <p class="member-desc">负责手势识别算法开发、系统集成和项目协调</p>
+                    <div class="member-skills">
+                        <span class="skill-tag">Python</span>
+                        <span class="skill-tag">TensorFlow</span>
+                        <span class="skill-tag">OpenCV</span>
+                    </div>
+                </div>
+                
+                <div class="team-member">
+                    <div class="member-avatar">
+                        <span>🔧</span>
+                    </div>
+                    <h3 class="member-name">李强</h3>
+                    <p class="member-role">嵌入式系统工程师</p>
+                    <p class="member-desc">负责ESP32-S3飞控系统、硬件集成和电机控制</p>
+                    <div class="member-skills">
+                        <span class="skill-tag">C++</span>
+                        <span class="skill-tag">ESP32</span>
+                        <span class="skill-tag">PCB设计</span>
+                    </div>
+                </div>
+                
+                <div class="team-member">
+                    <div class="member-avatar">
+                        <span>📐</span>
+                    </div>
+                    <h3 class="member-name">王雪</h3>
+                    <p class="member-role">机械结构工程师</p>
+                    <p class="member-desc">负责手甲结构设计、3D建模和变形机构优化</p>
+                    <div class="member-skills">
+                        <span class="skill-tag">SolidWorks</span>
+                        <span class="skill-tag">3D打印</span>
+                        <span class="skill-tag">机构设计</span>
+                    </div>
+                </div>
+                
+                <div class="team-member">
+                    <div class="member-avatar">
+                        <span>⚡</span>
+                    </div>
+                    <h3 class="member-name">赵琳</h3>
+                    <p class="member-role">电子与通信工程师</p>
+                    <p class="member-desc">负责电路设计、电源管理和无线通信系统</p>
+                    <div class="member-skills">
+                        <span class="skill-tag">电路设计</span>
+                        <span class="skill-tag">WiFi/蓝牙</span>
+                        <span class="skill-tag">电源管理</span>
+                    </div>
                 </div>
             </div>
         </div>
