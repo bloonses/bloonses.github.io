@@ -3,994 +3,686 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>猎枭一号 - ESP32-S3 手甲无人机项目</title>
+    <title>C语言图书管理系统 - 教学指南</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        techBlue: '#0f172a',
+                        neonBlue: '#3b82f6',
+                        neonPurple: '#8b5cf6',
+                        accent: '#ec4899',
+                        highlight: '#06b6d4'
+                    },
+                    fontFamily: {
+                        orbitron: ['Orbitron', 'sans-serif'],
+                        inter: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        :root {
-            --primary: #2a4365;
-            --secondary: #3182ce;
-            --accent: #63b3ed;
-            --light: #ebf8ff;
-            --dark: #1a365d;
-            --text: #2d3748;
-            --text-light: #718096;
-            --success: #38a169;
-            --warning: #d69e2e;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
-        }
-        
         body {
-            background-color: #f7fafc;
-            color: var(--text);
-            line-height: 1.6;
+            background-color: #0a1121;
+            color: #e2e8f0;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 20%),
+                linear-gradient(to bottom, #0a1121, #0f172a);
         }
         
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
+        .tech-border {
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.2), 
+                        inset 0 0 10px rgba(59, 130, 246, 0.1);
         }
         
-        /* 导航栏样式 */
-        header {
-            background-color: var(--primary);
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        .neon-text {
+            text-shadow: 0 0 5px rgba(59, 130, 246, 0.7),
+                         0 0 10px rgba(59, 130, 246, 0.5);
         }
         
-        nav {
+        .glow-card {
+            transition: all 0.3s ease;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(10px);
+        }
+        
+        .glow-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+        }
+        
+        .code-block {
+            background: #1e293b;
+            border-left: 3px solid #3b82f6;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 15px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding: 20px 0;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 15px;
         }
         
-        .logo {
+        .circuit-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(59, 130, 246, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(59, 130, 246, 0.05) 1px, transparent 1px);
+            background-size: 30px 30px;
+            z-index: -1;
+            opacity: 0.3;
+        }
+        
+        .book-3d {
+            transform: perspective(1000px) rotateY(-10deg) rotateX(5deg);
+            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.4);
+            border-radius: 8px;
+            transition: transform 0.4s ease;
+        }
+        
+        .book-3d:hover {
+            transform: perspective(1000px) rotateY(0deg) rotateX(0deg);
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+        }
+        
+        .step-card {
+            counter-increment: step-counter;
+            position: relative;
+            padding-left: 80px;
+        }
+        
+        .step-card::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', sans-serif;
             font-size: 24px;
             font-weight: bold;
-            color: white;
         }
         
-        .nav-links {
-            display: flex;
-            list-style: none;
+        .scroll-down {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
         }
         
-        .nav-links li {
-            margin-left: 30px;
-        }
-        
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            font-size: 16px;
-            transition: color 0.3s;
-        }
-        
-        .nav-links a:hover {
-            color: var(--accent);
-        }
-        
-        /* 快捷目录样式 */
-        .quick-nav {
-            position: fixed;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            padding: 15px;
-            z-index: 999;
-            max-width: 180px;
-        }
-        
-        .quick-nav-content h4 {
-            color: var(--primary);
-            margin-bottom: 10px;
-            font-size: 1rem;
-        }
-        
-        .quick-nav ul {
-            list-style: none;
-        }
-        
-        .quick-nav li {
-            margin-bottom: 8px;
-        }
-        
-        .quick-nav a {
-            color: var(--text-light);
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: color 0.3s;
-            display: block;
-            padding: 3px 0;
-        }
-        
-        .quick-nav a:hover {
-            color: var(--secondary);
-        }
-        
-        /* 英雄区域样式 */
-        .hero {
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            padding-top: 80px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: white;
-        }
-        
-        .hero-content {
-            max-width: 600px;
-        }
-        
-        .hero h1 {
-            font-size: 3.5rem;
-            margin-bottom: 20px;
-        }
-        
-        .hero p {
-            font-size: 1.2rem;
-            margin-bottom: 30px;
-            opacity: 0.9;
-        }
-        
-        .btn {
-            display: inline-block;
-            padding: 12px 28px;
-            background-color: var(--accent);
-            color: white;
-            border: none;
-            border-radius: 4px;
-            text-decoration: none;
-            font-size: 16px;
-            font-weight: bold;
-            transition: all 0.3s;
-            cursor: pointer;
-        }
-        
-        .btn:hover {
-            background-color: #4299e1;
-            transform: translateY(-2px);
-        }
-        
-        /* 通用区域样式 */
-        .section {
-            padding: 100px 0;
-        }
-        
-        .section-title {
-            font-size: 2.5rem;
-            text-align: center;
-            margin-bottom: 60px;
-            color: var(--primary);
-            position: relative;
-        }
-        
-        .section-title:after {
-            content: '';
-            display: block;
-            width: 80px;
-            height: 4px;
-            background-color: var(--accent);
-            margin: 15px auto;
-            border-radius: 2px;
-        }
-        
-        /* 项目目标区域 */
-        .goals {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 30px;
-        }
-        
-        .goal-card {
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            transition: transform 0.3s;
-        }
-        
-        .goal-card:hover {
-            transform: translateY(-10px);
-        }
-        
-        .goal-icon {
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-            color: var(--secondary);
-        }
-        
-        .goal-card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 15px;
-            color: var(--primary);
-        }
-        
-        /* 硬件清单区域 */
-        .hardware-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 30px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        
-        .hardware-table th {
-            background-color: var(--primary);
-            color: white;
-            padding: 15px;
-            text-align: left;
-        }
-        
-        .hardware-table td {
-            padding: 15px;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        
-        .hardware-table tr:nth-child(even) {
-            background-color: #f7fafc;
-        }
-        
-        .hardware-table tr:hover {
-            background-color: #edf2f7;
-        }
-        
-        /* 系统框架区域 */
-        .system-overview {
-            background-color: white;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        }
-        
-        .flow-diagram {
-            text-align: center;
-            margin: 40px 0;
-        }
-        
-        .flow-step {
-            display: inline-block;
-            margin: 0 20px;
-            text-align: center;
-            vertical-align: top;
-            width: 150px;
-        }
-        
-        .flow-icon {
-            width: 80px;
-            height: 80px;
-            background-color: var(--light);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 15px;
-            font-size: 2rem;
-            color: var(--secondary);
-        }
-        
-        .flow-arrow {
-            display: inline-block;
-            font-size: 2rem;
-            color: var(--accent);
-            margin: 30px 10px 0;
-        }
-        
-        /* 功能模块区域 */
-        .modules {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-        }
-        
-        .module-card {
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        }
-        
-        .module-card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 15px;
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-        }
-        
-        .module-card h3:before {
-            content: '';
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            background-color: var(--accent);
-            border-radius: 50%;
-            margin-right: 10px;
-        }
-        
-        /* 团队成员样式 */
-        .team-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 30px;
-            margin-top: 40px;
-        }
-        
-        .team-member {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            transition: transform 0.3s;
-        }
-        
-        .team-member:hover {
-            transform: translateY(-5px);
-        }
-        
-        .member-avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--secondary), var(--accent));
-            margin: 0 auto 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-        }
-        
-        .member-name {
-            font-size: 1.4rem;
-            color: var(--primary);
-            margin-bottom: 8px;
-        }
-        
-        .member-role {
-            color: var(--secondary);
-            font-weight: 600;
-            margin-bottom: 15px;
-            font-size: 1rem;
-        }
-        
-        .member-desc {
-            color: var(--text-light);
-            margin-bottom: 20px;
-            line-height: 1.5;
-        }
-        
-        .member-skills {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .skill-tag {
-            background: var(--light);
-            color: var(--secondary);
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-        
-        /* 预算区域 */
-        .budget-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 30px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        
-        .budget-table th {
-            background-color: var(--primary);
-            color: white;
-            padding: 15px;
-            text-align: left;
-        }
-        
-        .budget-table td {
-            padding: 15px;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        
-        .budget-table tr:nth-child(even) {
-            background-color: #f7fafc;
-        }
-        
-        .budget-total {
-            font-weight: bold;
-            background-color: var(--light) !important;
-            color: var(--primary);
-        }
-        
-        /* 代码展示区域 */
-        .code-block {
-            background-color: #2d3748;
-            color: #e2e8f0;
-            padding: 20px;
-            border-radius: 8px;
-            font-family: 'Courier New', monospace;
-            overflow-x: auto;
-            margin: 20px 0;
-        }
-        
-        /* 页脚样式 */
-        footer {
-            background-color: var(--dark);
-            color: white;
-            padding: 50px 0 30px;
-        }
-        
-        .footer-content {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            margin-bottom: 30px;
-        }
-        
-        .footer-section {
-            flex: 1;
-            min-width: 250px;
-            margin-bottom: 30px;
-        }
-        
-        .footer-section h3 {
-            color: var(--accent);
-            margin-bottom: 20px;
-            font-size: 1.2rem;
-        }
-        
-        .footer-links {
-            list-style: none;
-        }
-        
-        .footer-links li {
-            margin-bottom: 10px;
-        }
-        
-        .footer-links a {
-            color: #cbd5e0;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-        
-        .footer-links a:hover {
-            color: var(--accent);
-        }
-        
-        .copyright {
-            text-align: center;
-            padding-top: 30px;
-            border-top: 1px solid #4a5568;
-            color: #a0aec0;
-            font-size: 0.9rem;
-        }
-        
-        /* 响应式设计 */
-        @media (max-width: 1024px) {
-            .quick-nav {
-                display: none;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-            
-            .hero h1 {
-                font-size: 2.5rem;
-            }
-            
-            .section-title {
-                font-size: 2rem;
-            }
-            
-            .flow-step {
-                display: block;
-                margin: 20px auto;
-            }
-            
-            .flow-arrow {
-                display: block;
-                margin: 10px auto;
-                transform: rotate(90deg);
-            }
-            
-            .team-grid {
-                grid-template-columns: 1fr;
-            }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0) translateX(-50%);}
+            40% {transform: translateY(-20px) translateX(-50%);}
+            60% {transform: translateY(-10px) translateX(-50%);}
         }
     </style>
 </head>
-<body>
-    <!-- 快捷目录 -->
-    <div class="quick-nav">
-        <div class="quick-nav-content">
-            <h4>快速导航</h4>
-            <ul>
-                <li><a href="#project">项目目标</a></li>
-                <li><a href="#hardware">硬件清单</a></li>
-                <li><a href="#system">系统框架</a></li>
-                <li><a href="#modules">功能模块</a></li>
-                <li><a href="#team">团队成员</a></li>
-                <li><a href="#budget">预算结构</a></li>
-                <li><a href="#resources">开发资源</a></li>
-            </ul>
+<body class="relative min-h-screen">
+    <div class="circuit-bg"></div>
+    
+    <!-- Hero Section -->
+    <header class="relative pt-24 pb-32 px-4 md:px-8 overflow-hidden">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="md:w-1/2 mb-12 md:mb-0 z-10">
+                    <h1 class="text-4xl md:text-6xl font-bold mb-6 font-orbitron neon-text text-white">
+                        C语言图书管理系统
+                    </h1>
+                    <h2 class="text-xl md:text-2xl text-cyan-300 mb-8 font-orbitron">
+                        保姆式教学指南 - 从入门到精通
+                    </h2>
+                    <p class="text-lg text-gray-300 mb-8 max-w-2xl">
+                        一个功能全面的C语言实战项目，涵盖链表操作、文件I/O、用户界面设计等核心编程概念，是学习C语言的完美教学案例。
+                    </p>
+                    <div class="flex flex-wrap gap-4">
+                        <a href="#features" class="px-6 py-3 bg-gradient-to-r from-neonBlue to-neonPurple rounded-lg font-semibold text-white hover:opacity-90 transition">
+                            <i class="fas fa-book mr-2"></i>功能特性
+                        </a>
+                        <a href="#code" class="px-6 py-3 tech-border rounded-lg font-semibold text-neonBlue hover:bg-opacity-10 hover:bg-neonBlue transition">
+                            <i class="fas fa-code mr-2"></i>代码解析
+                        </a>
+                    </div>
+                </div>
+                <div class="md:w-1/2 flex justify-center z-10">
+                    <div class="relative">
+                        <div class="book-3d w-64 h-80 bg-gradient-to-br from-blue-900 to-purple-900 relative overflow-hidden">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="text-center p-6">
+                                    <i class="fas fa-book-open text-6xl text-cyan-300 mb-4"></i>
+                                    <h3 class="text-xl font-bold text-white font-orbitron">C语言图书系统</h3>
+                                    <p class="text-cyan-200 mt-2">链表 + 文件I/O</p>
+                                </div>
+                            </div>
+                            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-cyan-400 to-blue-500"></div>
+                        </div>
+                        <div class="absolute -top-6 -right-6 w-32 h-32 bg-purple-600 rounded-full opacity-20 blur-xl"></div>
+                        <div class="absolute -bottom-6 -left-6 w-40 h-40 bg-blue-600 rounded-full opacity-20 blur-xl"></div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
-
-    <!-- 导航栏 -->
-    <header>
-        <div class="container">
-            <nav>
-                <div class="logo">猎枭一号</div>
-                <ul class="nav-links">
-                    <li><a href="#project">项目概述</a></li>
-                    <li><a href="#hardware">硬件清单</a></li>
-                    <li><a href="#system">系统框架</a></li>
-                    <li><a href="#modules">功能模块</a></li>
-                    <li><a href="#team">团队成员</a></li>
-                    <li><a href="#budget">预算结构</a></li>
-                    <li><a href="#resources">开发资源</a></li>
-                </ul>
-            </nav>
+        <div class="scroll-down text-neonBlue text-4xl">
+            <i class="fas fa-chevron-down"></i>
         </div>
     </header>
 
-    <!-- 英雄区域 -->
-    <section class="hero" id="home">
-        <div class="container">
-            <div class="hero-content">
-                <h1>猎枭一号</h1>
-                <h2>ESP32-S3 手甲无人机完整方案</h2>
-                <p>基于ESP32-S3的智能手甲无人机系统，集手势识别、AI计算与无人机控制于一体，实现从手甲到无人机的无缝变形与操控。</p>
-                <a href="#project" class="btn">了解项目详情</a>
+    <!-- Key Stats -->
+    <section class="py-12 px-4 md:px-8">
+        <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div class="glow-card tech-border rounded-xl p-6 text-center">
+                <div class="text-4xl font-bold text-cyan-300 font-orbitron">9+</div>
+                <div class="text-gray-300 mt-2">核心功能</div>
+            </div>
+            <div class="glow-card tech-border rounded-xl p-6 text-center">
+                <div class="text-4xl font-bold text-cyan-300 font-orbitron">4</div>
+                <div class="text-gray-300 mt-2">核心模块</div>
+            </div>
+            <div class="glow-card tech-border rounded-xl p-6 text-center">
+                <div class="text-4xl font-bold text-cyan-300 font-orbitron">3</div>
+                <div class="text-gray-300 mt-2">数据结构</div>
+            </div>
+            <div class="glow-card tech-border rounded-xl p-6 text-center">
+                <div class="text-4xl font-bold text-cyan-300 font-orbitron">100%</div>
+                <div class="text-gray-300 mt-2">教学适用</div>
             </div>
         </div>
     </section>
 
-    <!-- 项目目标 -->
-    <section class="section" id="project">
-        <div class="container">
-            <h2 class="section-title">项目目标</h2>
-            <div class="goals">
-                <div class="goal-card">
-                    <div class="goal-icon">🚁</div>
-                    <h3>变形设计</h3>
-                    <p>无人机可变形为手甲佩戴，实现便携与功能的完美结合。</p>
-                </div>
-                <div class="goal-card">
-                    <div class="goal-icon">👋</div>
-                    <h3>手势识别</h3>
-                    <p>摄像头采集手部图像，识别握拳（就绪）与张开五指（起飞）手势。</p>
-                </div>
-                <div class="goal-card">
-                    <div class="goal-icon">📹</div>
-                    <h3>实时传输</h3>
-                    <p>飞行期间摄像头视频实时传输至电脑，实现远程监控。</p>
-                </div>
-                <div class="goal-card">
-                    <div class="goal-icon">🧠</div>
-                    <h3>AI集成</h3>
-                    <p>全部使用ESP32-S3，无需Arduino，充分利用其强大算力与AI能力。</p>
-                </div>
+    <!-- Features Section -->
+    <section id="features" class="py-16 px-4 md:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4 font-orbitron">
+                    系统核心特性
+                </h2>
+                <div class="w-20 h-1 bg-gradient-to-r from-neonBlue to-neonPurple mx-auto"></div>
             </div>
-        </div>
-    </section>
-
-    <!-- 硬件清单 -->
-    <section class="section" id="hardware">
-        <div class="container">
-            <h2 class="section-title">主要硬件清单</h2>
-            <table class="hardware-table">
-                <thead>
-                    <tr>
-                        <th>名称</th>
-                        <th>推荐型号</th>
-                        <th>功能说明</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>主控</td>
-                        <td>ESP32-S3开发板</td>
-                        <td>支持AI加速，算力远超普通ESP32及Arduino</td>
-                    </tr>
-                    <tr>
-                        <td>摄像头模块</td>
-                        <td>OV2640 (M5系列摄像头或兼容)</td>
-                        <td>适配ESP32摄像头应用</td>
-                    </tr>
-                    <tr>
-                        <td>电机</td>
-                        <td>8520无刷电机×4</td>
-                        <td>轻型四轴机常用</td>
-                    </tr>
-                    <tr>
-                        <td>电调 ESC</td>
-                        <td>迷你无刷ESC×4</td>
-                        <td>控制电机</td>
-                    </tr>
-                    <tr>
-                        <td>供电</td>
-                        <td>3.7V锂电 550mAh</td>
-                        <td>小型飞行器电池</td>
-                    </tr>
-                    <tr>
-                        <td>舵机</td>
-                        <td>SG90微型舵机×2</td>
-                        <td>展开结构用</td>
-                    </tr>
-                    <tr>
-                        <td>机体结构</td>
-                        <td>3D打印/碳纤/软质材料</td>
-                        <td>手甲+可展开型四轴机架</td>
-                    </tr>
-                    <tr>
-                        <td>周边材料</td>
-                        <td>魔术贴/磁扣等</td>
-                        <td>固定和佩戴</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </section>
-
-    <!-- 系统框架 -->
-    <section class="section" id="system">
-        <div class="container">
-            <h2 class="section-title">系统框架总览</h2>
-            <div class="system-overview">
-                <div class="flow-diagram">
-                    <div class="flow-step">
-                        <div class="flow-icon">🖐️</div>
-                        <h4>手甲形态</h4>
-                        <p>摄像头检测手部手势</p>
-                    </div>
-                    <div class="flow-arrow">→</div>
-                    <div class="flow-step">
-                        <div class="flow-icon">🚁</div>
-                        <h4>无人机展开</h4>
-                        <p>手势控制展开过程</p>
-                    </div>
-                    <div class="flow-arrow">→</div>
-                    <div class="flow-step">
-                        <div class="flow-icon">👊</div>
-                        <h4>手势识别</h4>
-                        <p>握拳→准备<br>张开五指→起飞</p>
-                    </div>
-                    <div class="flow-arrow">→</div>
-                    <div class="flow-step">
-                        <div class="flow-icon">📡</div>
-                        <h4>ESP32-S3控制</h4>
-                        <p>控制起飞与电机</p>
-                    </div>
-                    <div class="flow-arrow">→</div>
-                    <div class="flow-step">
-                        <div class="flow-icon">📹</div>
-                        <h4>视频传输</h4>
-                        <p>飞行中实时传输视频</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 功能模块 -->
-    <section class="section" id="modules">
-        <div class="container">
-            <h2 class="section-title">功能模块及实现步骤</h2>
-            <div class="modules">
-                <div class="module-card">
-                    <h3>机体结构设计</h3>
-                    <p><strong>收纳式四轴结构：</strong>手甲为主板，四轴臂折叠后与手背贴合。</p>
-                    <p><strong>舵机/机械按钮：</strong>用于展开机臂，可软件自动控制或手动触发。</p>
-                    <p><strong>摄像头位置：</strong>建议放在手背/掌心上方，能完整拍摄手部动作。</p>
-                </div>
-                <div class="module-card">
-                    <h3>摄像头手势识别</h3>
-                    <p><strong>方案一：本地AI识别</strong></p>
-                    <p>利用ESP32-S3的AI协处理单元，部署轻量型手势识别模型（TFLite Micro、ESP-DL框架）。</p>
-                    <p><strong>方案二：图像上传至PC识别（入门版）</strong></p>
-                    <p>摄像头拍照通过无线传到电脑，由PC端OpenCV识别，再通过WiFi控制无人机。</p>
-                </div>
-                <div class="module-card">
-                    <h3>飞控与起飞流程</h3>
-                    <p>ESP32-S3控制飞行器四轴基本动作：</p>
-                    <ul>
-                        <li>IO口PWM直接驱动ESC（需4路PWM，S3支持）</li>
-                        <li>起飞/降落流程由手势识别逻辑决定</li>
-                        <li>舵机用于展开臂，由S3 PWM口控制</li>
-                    </ul>
-                </div>
-                <div class="module-card">
-                    <h3>摄像头实时视频传输</h3>
-                    <p>ESP32-S3本地MJPEG/WebServer：</p>
-                    <ul>
-                        <li>摄像头模块推流至Web服务器</li>
-                        <li>PC端同局域网用浏览器访问</li>
-                        <li>飞行期间持续采集并传输</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 团队成员 -->
-    <section class="section" id="team">
-        <div class="container">
-            <h2 class="section-title">团队成员</h2>
-            <div class="team-grid">
-                <div class="team-member">
-                    <div class="member-avatar">
-                        <span>👨‍💻</span>
-                    </div>
-                    <h3 class="member-name">刘一鸣</h3>
-                    <p class="member-role">AI算法工程师</p>
-                    <p class="member-desc">负责手势识别算法开发、系统集成和项目协调</p>
-                    <div class="member-skills">
-                        <span class="skill-tag">Python</span>
-                        <span class="skill-tag">TensorFlow</span>
-                        <span class="skill-tag">OpenCV</span>
-                    </div>
-                </div>
-                
-                <div class="team-member">
-                    <div class="member-avatar">
-                        <span>🔧</span>
-                    </div>
-                    <h3 class="member-name">王冠博</h3>
-                    <p class="member-role">嵌入式系统工程师</p>
-                    <p class="member-desc">负责ESP32-S3飞控系统、硬件集成和电机控制</p>
-                    <div class="member-skills">
-                        <span class="skill-tag">C++</span>
-                        <span class="skill-tag">ESP32</span>
-                        <span class="skill-tag">PCB设计</span>
-                    </div>
-                </div>
-                
-                <div class="team-member">
-                    <div class="member-avatar">
-                        <span>📐</span>
-                    </div>
-                    <h3 class="member-name">王润松</h3>
-                    <p class="member-role">机械结构工程师</p>
-                    <p class="member-desc">负责手甲结构设计、3D建模和变形机构优化</p>
-                    <div class="member-skills">
-                        <span class="skill-tag">SolidWorks</span>
-                        <span class="skill-tag">3D打印</span>
-                        <span class="skill-tag">机构设计</span>
-                    </div>
-                </div>
-                
-                <div class="team-member">
-                    <div class="member-avatar">
-                        <span>⚡</span>
-                    </div>
-                    <h3 class="member-name">宋政泽</h3>
-                    <p class="member-role">材料部件采购主管</p>
-                    <p class="member-desc">负责材料部件的采购</p>
-                    <div class="member-skills">
-                        <span class="skill-tag">经费管理</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 预算与结构 -->
-    <section class="section" id="budget">
-        <div class="container">
-            <h2 class="section-title">预算与结构设计</h2>
-            <h3 style="margin-bottom: 20px; color: var(--primary);">零件清单与参考价格</h3>
-            <table class="budget-table">
-                <thead>
-                    <tr>
-                        <th>零件名称</th>
-                        <th>推荐型号/规格</th>
-                        <th>单价 (RMB)</th>
-                        <th>数量</th>
-                        <th>总价 (RMB)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>ESP32-S3开发板</td>
-                        <td>M5Stack ESP32-S3（带摄像头）</td>
-                        <td>¥89</td>
-                        <td>1</td>
-                        <td>¥89</td>
-                    </tr>
-                    <tr>
-                        <td>无刷电机</td>
-                        <td>8520（4mm轴、四轴专用）</td>
-                        <td>¥19</td>
-                        <td>4</td>
-                        <td>¥76</td>
-                    </tr>
-                    <tr>
-                        <td>电子调速器 ESC</td>
-                        <td>迷你无刷ESC（1S，3-6A）</td>
-                        <td>¥28</td>
-                        <td>4</td>
-                        <td>¥112</td>
-                    </tr>
-                    <tr>
-                        <td>锂电池</td>
-                        <td>3.7V 550mAh（聚合物）</td>
-                        <td>¥26</td>
-                        <td>1</td>
-                        <td>¥26</td>
-                    </tr>
-                    <tr>
-                        <td>舵机（臂折叠）</td>
-                        <td>SG90微型舵机</td>
-                        <td>¥15</td>
-                        <td>2</td>
-                        <td>¥30</td>
-                    </tr>
-                    <tr>
-                        <td>机架/定制外壳</td>
-                        <td>3D打印or碳纤</td>
-                        <td>¥40</td>
-                        <td>1</td>
-                        <td>¥40</td>
-                    </tr>
-                    <tr>
-                        <td>魔术贴/磁扣螺丝</td>
-                        <td>杂项配件</td>
-                        <td>¥10</td>
-                        <td>1套</td>
-                        <td>¥10</td>
-                    </tr>
-                    <tr class="budget-total">
-                        <td colspan="4" style="text-align: right;">总价估算（基础版）：</td>
-                        <td>¥383</td>
-                    </tr>
-                </tbody>
-            </table>
             
-            <div style="margin-top: 40px;">
-                <h3 style="margin-bottom: 20px; color: var(--primary);">结构蓝图设计</h3>
-                <div class="module-card">
-                    <h4>结构布局</h4>
-                    <p><strong>手甲形态：</strong>机臂收起贴合手背，摄像头朝下或正面拍摄手部动作。</p>
-                    <p><strong>无人机形态：</strong>四轴臂弹出，呈十字布局，主板+电池+摄像头居中。</p>
-                    <p><strong>佩戴设计：</strong>底部使用魔术贴或可调卡扣，确保稳固佩戴。</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="glow-card tech-border rounded-xl p-6">
+                    <div class="feature-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-white mb-3">图书管理功能</h3>
+                    <p class="text-gray-300">
+                        完整的增删改查(CRUD)功能，支持多条件搜索，包括书名、作者、ISBN等，提供清晰的表格展示界面。
+                    </p>
+                    <ul class="mt-4 space-y-2">
+                        <li class="flex items-center text-cyan-200">
+                            <i class="fas fa-check-circle mr-2 text-green-400"></i>
+                            添加/删除/修改图书信息
+                        </li>
+                        <li class="flex items-center text-cyan-200">
+                            <i class="fas fa-check-circle mr-2 text-green-400"></i>
+                            多条件高级搜索
+                        </li>
+                        <li class="flex items-center text-cyan-200">
+                            <i class="fas fa-check-circle mr-2 text-green-400"></i>
+                            库存数量管理
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Feature 2 -->
+                <div class="glow-card tech-border rounded-xl p-6">
+                    <div class="feature-icon">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-white mb-3">数据持久化</h3>
+                    <p class="text-gray-300">
+                        使用二进制文件存储技术，确保数据永久保存，支持数据的导入导出功能。
+                    </p>
+                    <ul class="mt-4 space-y-2">
+                        <li class="flex items-center text-cyan-200">
+                            <i class="fas fa-check-circle mr-2 text-green-400"></i>
+                            二进制文件存储
+                        </li>
+                        <li class="flex items-center text-cyan-200">
+                            <i class="fas fa-check-circle mr-2 text-green-400"></i>
+                            运行时数据自动保存
+                        </li>
+                        <li class="flex items-center text-cyan-200">
+                            <i class="fas fa-check-circle mr-2 text-green-400"></i>
+                            退出时数据保存确认
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Feature 3 -->
+                <div class="glow-card tech-border rounded-xl p-6">
+                    <div class="feature-icon">
+                        <i class="fas fa-user-lock"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-white mb-3">用户管理系统</h3>
+                    <p class="text-gray-300">
+                        完整的用户账号系统，支持注册、登录功能，区分管理员和普通用户权限。
+                    </p>
+                    <ul class="mt-4 space-y-2">
+                        <li class="flex items-center text-cyan-200">
+                            <i class="fas fa-check-circle mr-2 text-green-400"></i>
+                            用户注册与登录
+                        </li>
+                        <li class="flex items-center text-cyan-200">
+                            <i class="fas fa-check-circle mr-2 text-green-400"></i>
+                            管理员权限控制
+                        </li>
+                        <li class="flex items-center text-cyan-200">
+                            <i class="fas fa-check-circle mr-2 text-green-400"></i>
+                            用户数据加密存储
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Feature 4 -->
+                <div class="glow-card tech-border rounded-xl p-6">
+                    <div class="feature-icon">
+                        <i class="fas fa-sitemap"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-white mb-3">模块化架构</h3>
+                    <p class="text-gray-300">
+                        清晰的代码结构，分离为多个模块，便于教学和理解系统设计原理。
+                    </p>
+                    <ul class="mt-4 space-y-2">
+                        <li class="flex items-center text-cyan-200">
+                            <i class="fas fa-check-circle mr-2 text-green-400"></i>
+                            头文件(book.h)
+                        </li>
+                        <li class="flex items-center text-cyan-200">
+                            <i class="fas fa-check-circle mr-2 text-green-400"></i>
+                            核心功能(book.c)
+                        </li>
+                        <li class="flex items-center text-cyan-200">
+                            <i class="fas fa-check-circle mr-2 text-green-400"></i>
+                            文件操作(file.c)
+                        </li>
+                        <li class="flex items-center text-cyan-200">
+                            <i class="fas fa-check-circle mr-2 text-green-400"></i>
+                            主程序(main.c)
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Feature 5 -->
+                <div class="glow-card tech-border rounded-xl p-6">
+                    <div class="feature-icon">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-white mb-3">数据结构与算法</h3>
+                    <p class="text-gray-300">
+                        使用单链表存储图书信息，实现高效的数据操作和管理。
+                    </p>
+                    <ul class="mt-4 space-y-2">
+                        <li class="flex items-center text-cyan-200">
+                            <i class="fas fa-check-circle mr-2 text-green-400"></i>
+                            链表数据结构
+                        </li>
+                        <li class="flex items-center text-cyan-200">
+                            <i class="fas fa-check-circle mr-2 text-green-400"></i>
+                            动态内存管理
+                        </li>
+                        <li class="flex items-center text-cyan-200">
+                            <i class="fas fa-check-circle mr-2 text-green-400"></i>
+                            高效查找算法
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Feature 6 -->
+                <div class="glow-card tech-border rounded-xl p-6">
+                    <div class="feature-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-white mb-3">教学价值</h3>
+                    <p class="text-gray-300">
+                        完美涵盖C语言核心知识点，是学习编程的理想实践项目。
+                    </p>
+                    <ul class="mt-4 space-y-2">
+                        <li class="flex items-center text-cyan-200">
+                            <i class="fas fa-check-circle mr-2 text-green-400"></i>
+                            C语言语法实践
+                        </li>
+                        <li class="flex items-center text-cyan-200">
+                            <i class="fas fa-check-circle mr-2 text-green-400"></i>
+                            数据结构应用
+                        </li>
+                        <li class="flex items-center text-cyan-200">
+                            <i class="fas fa-check-circle mr-2 text-green-400"></i>
+                            文件I/O操作
+                        </li>
+                        <li class="flex items-center text-cyan-200">
+                            <i class="fas fa-check-circle mr-2 text-green-400"></i>
+                            模块化编程思想
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- 资源与流程 -->
-    <section class="section" id="resources">
-        <div class="container">
-            <h2 class="section-title">开发资源与流程</h2>
-            <div class="modules">
-                <div class="module-card">
-                    <h3>程序开发流程</h3>
-                    <p><strong>手势识别代码（伪代码）：</strong></p>
-                    <div class="code-block">
-                        // 初始化摄像头与手势识别模型<br>
-                        initCamera();<br>
-                        initGestureModel();<br><br>
-                        
-                        // 循环识别<br>
-                        loop {<br>
-                        &nbsp;&nbsp;frame = cameraCapture();<br>
-                        &nbsp;&nbsp;gesture = modelPredict(frame);<br>
-                        &nbsp;&nbsp;if (gesture == "fist") setReadyState();<br>
-                        &nbsp;&nbsp;else if (gesture == "open_hand" && isReady()) {<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;unfoldArms();<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;startMotors();<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;startVideoStream();<br>
-                        &nbsp;&nbsp;}<br>
-                        }
+    <!-- Code Structure -->
+    <section id="code" class="py-16 px-4 md:px-8 bg-gradient-to-b from-techBlue to-blue-900/20">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4 font-orbitron">
+                    系统架构与代码解析
+                </h2>
+                <div class="w-20 h-1 bg-gradient-to-r from-neonBlue to-neonPurple mx-auto"></div>
+                <p class="text-gray-400 max-w-2xl mx-auto mt-4">
+                    清晰的文件结构与模块化设计，便于理解和教学
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="text-2xl font-semibold text-white mb-6 font-orbitron">核心文件结构</h3>
+                    
+                    <div class="glow-card tech-border rounded-xl p-6 mb-6">
+                        <div class="flex items-center mb-4">
+                            <i class="fas fa-folder-open text-cyan-400 text-xl mr-3"></i>
+                            <h4 class="text-lg font-semibold text-white">项目目录结构</h4>
+                        </div>
+                        <pre class="code-block rounded-lg p-4 text-sm overflow-x-auto">
+ai/
+├── src/
+│   ├── main.c        # 主程序和用户界面
+│   ├── book.c        # 核心功能实现
+│   ├── book.h        # 头文件，定义结构体和函数
+│   ├── file.c        # 文件操作实现
+│   ├── bin/          # 编译后的可执行文件
+│   ├── algorithm/    # 算法相关文件
+│   ├── makefile      # 编译配置文件
+│   ├── README.md     # 项目说明文档
+│   └── books.dat     # 图书数据文件（运行时生成）</pre>
+                    </div>
+                    
+                    <div class="glow-card tech-border rounded-xl p-6">
+                        <div class="flex items-center mb-4">
+                            <i class="fas fa-code text-purple-400 text-xl mr-3"></i>
+                            <h4 class="text-lg font-semibold text-white">数据结构定义</h4>
+                        </div>
+                        <pre class="code-block rounded-lg p-4 text-sm overflow-x-auto">
+// 图书结构体
+struct Book {
+    char title[MAX_TITLE_LEN];   // 书名
+    char author[MAX_AUTHOR_LEN]; // 作者
+    char publisher[MAX_PUBLISHER_LEN]; // 出版社
+    char ISBN[MAX_ISBN_LEN];     // ISBN
+    char genre[MAX_GENRE_LEN];   // 分类
+    float price;                 // 价格
+    int year;                    // 出版年份
+    int quantity;                // 库存数量
+};
+
+// 用户结构体
+struct User {
+    char username[MAX_USERNAME_LEN]; // 用户名
+    char password[MAX_PASSWORD_LEN]; // 密码
+    int isAdmin;                     // 是否为管理员
+};
+
+// 链表节点结构体
+struct BookNode {
+    Book book;                     // 图书信息
+    struct BookNode* next;         // 指向下一个节点的指针
+};</pre>
                     </div>
                 </div>
-                <div class="module-card">
-                    <h3>部署和控制流程</h3>
-                    <ol style="padding-left: 20px;">
-                        <li>初始，手甲模式：机臂收起，主板+摄像头激活，佩戴于手背。</li>
-                        <li>摄像头持续扫描手背手势，AI本地识别握拳（准备）/张开五指（起飞）。</li>
-                        <li>握拳：舵机带动臂准备展开，进入"就绪"。</li>
-                        <li>张开五指：四轴臂全部弹开，电调驱动电机启动，进入飞行状态。</li>
-                        <li>飞行时，摄像头视频流通过WiFi推送到电脑。</li>
-                        <li>降落或熄火后，机臂收起恢复手甲佩戴状态。</li>
-                    </ol>
-                </div>
-                <div class="module-card">
-                    <h3>参考资源</h3>
-                    <ul style="padding-left: 20px;">
-                        <li>ESP32-S3官方文档与AI手势识别教程</li>
-                        <li>M5Stack ESP32-S3摄像头模块文档</li>
-                        <li>视频流WebServer、ESP32多路PWM驱动ESC代码</li>
-                        <li>开源手势AI模型训练资料：leapgestrecog数据集</li>
-                        <li>舵机/电调驱动PWM参考</li>
-                    </ul>
+                
+                <div>
+                    <h3 class="text-2xl font-semibold text-white mb-6 font-orbitron">核心功能实现</h3>
+                    
+                    <div class="glow-card tech-border rounded-xl p-6 mb-6">
+                        <div class="flex items-center mb-4">
+                            <i class="fas fa-book text-green-400 text-xl mr-3"></i>
+                            <h4 class="text-lg font-semibold text-white">添加图书功能</h4>
+                        </div>
+                        <pre class="code-block rounded-lg p-4 text-sm overflow-x-auto">
+void addBook(BookManager* manager) {
+    Book newBook;
+    // 输入图书信息（验证逻辑）
+    inputString("书名：", newBook.title, MAX_TITLE_LEN);
+    // ISBN验证
+    do {
+        inputString("ISBN：", newBook.ISBN, MAX_ISBN_LEN);
+    } while (!isValidISBN(newBook.ISBN) || 
+             findBookByISBN(manager, newBook.ISBN) != NULL);
+    
+    // 创建节点并添加到链表头部
+    BookNode* newNode = createBookNode(&newBook);
+    newNode->next = manager->head;
+    manager->head = newNode;
+    manager->count++;
+    printf("图书添加成功!\n");
+}</pre>
+                    </div>
+                    
+                    <div class="glow-card tech-border rounded-xl p-6">
+                        <div class="flex items-center mb-4">
+                            <i class="fas fa-save text-yellow-400 text-xl mr-3"></i>
+                            <h4 class="text-lg font-semibold text-white">数据持久化</h4>
+                        </div>
+                        <pre class="code-block rounded-lg p-4 text-sm overflow-x-auto">
+// 保存数据到文件
+void saveToFile(BookManager *manager) {
+    FILE *file = fopen(FILENAME, "wb");
+    fwrite(&manager->count, sizeof(int), 1, file);
+    
+    BookNode *current = manager->head;
+    while (current != NULL) {
+        fwrite(&current->book, sizeof(Book), 1, file);
+        current = current->next;
+    }
+    
+    fclose(file);
+    printf("数据保存成功!\n");
+}
+
+// 从文件加载数据
+void loadFromFile(BookManager *manager) {
+    FILE *file = fopen(FILENAME, "rb");
+    // 先销毁现有链表
+    destroyManager(manager);
+    
+    int count;
+    fread(&count, sizeof(int), 1, file);
+    
+    for (int i = 0; i < count; i++) {
+        Book book;
+        fread(&book, sizeof(Book), 1, file);
+        
+        BookNode *newNode = createBookNode(&book);
+        newNode->next = manager->head;
+        manager->head = newNode;
+        manager->count++;
+    }
+    
+    fclose(file);
+    printf("数据加载成功！共加载 %d 本图书。\n", manager->count);
+}</pre>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- 页脚 -->
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h3>猎枭一号</h3>
-                    <p>ESP32-S3 手甲无人机完整方案</p>
+    <!-- Learning Path -->
+    <section class="py-16 px-4 md:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4 font-orbitron">
+                    学习路径与教学价值
+                </h2>
+                <div class="w-20 h-1 bg-gradient-to-r from-neonBlue to-neonPurple mx-auto"></div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div>
+                    <h3 class="text-2xl font-semibold text-cyan-300 mb-6">C语言核心知识点</h3>
+                    
+                    <div class="space-y-8">
+                        <div class="step-card">
+                            <h4 class="text-xl font-semibold text-white mb-2">数据结构与内存管理</h4>
+                            <p class="text-gray-300">
+                                通过链表实现图书存储，学习指针、动态内存分配(malloc/free)、结构体等核心概念。
+                            </p>
+                        </div>
+                        
+                        <div class="step-card">
+                            <h4 class="text-xl font-semibold text-white mb-2">文件I/O操作</h4>
+                            <p class="text-gray-300">
+                                掌握二进制文件的读写操作，实现数据持久化存储，学习文件操作的基本流程。
+                            </p>
+                        </div>
+                        
+                        <div class="step-card">
+                            <h4 class="text-xl font-semibold text-white mb-2">模块化编程</h4>
+                            <p class="text-gray-300">
+                                理解头文件(.h)和源文件(.c)的分离，学习如何设计清晰的程序架构。
+                            </p>
+                        </div>
+                        
+                        <div class="step-card">
+                            <h4 class="text-xl font-semibold text-white mb-2">用户输入与验证</h4>
+                            <p class="text-gray-300">
+                                实现健壮的用户输入处理，包括输入验证和错误处理机制。
+                            </p>
+                        </div>
+                    </div>
                 </div>
-                <div class="footer-section">
-                    <h3>项目链接</h3>
-                    <ul class="footer-links">
-                        <li><a href="#project">项目概述</a></li>
-                        <li><a href="#hardware">硬件清单</a></li>
-                        <li><a href="#system">系统框架</a></li>
-                        <li><a href="#modules">功能模块</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h3>技术资源</h3>
-                    <ul class="footer-links">
-                        <li><a href="#">ESP32-S3官方文档</a></li>
-                        <li><a href="#">ESP-DL AI库</a></li>
-                        <li><a href="#">手势识别数据集</a></li>
-                        <li><a href="#">3D打印资源</a></li>
-                    </ul>
+                
+                <div>
+                    <h3 class="text-2xl font-semibold text-cyan-300 mb-6">项目扩展方向</h3>
+                    
+                    <div class="glow-card tech-border rounded-xl p-6">
+                        <ul class="space-y-4">
+                            <li class="flex items-start">
+                                <i class="fas fa-arrow-circle-right text-green-400 mt-1 mr-3"></i>
+                                <div>
+                                    <h4 class="font-semibold text-white">图书借阅系统</h4>
+                                    <p class="text-gray-300">添加借阅记录和归还管理功能</p>
+                                </div>
+                            </li>
+                            
+                            <li class="flex items-start">
+                                <i class="fas fa-arrow-circle-right text-green-400 mt-1 mr-3"></i>
+                                <div>
+                                    <h4 class="font-semibold text-white">权限管理系统</h4>
+                                    <p class="text-gray-300">实现不同用户角色的权限管理</p>
+                                </div>
+                            </li>
+                            
+                            <li class="flex items-start">
+                                <i class="fas fa-arrow-circle-right text-green-400 mt-1 mr-3"></i>
+                                <div>
+                                    <h4 class="font-semibold text-white">数据库集成</h4>
+                                    <p class="text-gray-300">使用SQLite或MySQL替代文件存储</p>
+                                </div>
+                            </li>
+                            
+                            <li class="flex items-start">
+                                <i class="fas fa-arrow-circle-right text-green-400 mt-1 mr-3"></i>
+                                <div>
+                                    <h4 class="font-semibold text-white">图形界面</h4>
+                                    <p class="text-gray-300">使用GTK或Qt开发图形用户界面</p>
+                                </div>
+                            </li>
+                            
+                            <li class="flex items-start">
+                                <i class="fas fa-arrow-circle-right text-green-400 mt-1 mr-3"></i>
+                                <div>
+                                    <h4 class="font-semibold text-white">数据加密</h4>
+                                    <p class="text-gray-300">对用户密码和敏感数据进行加密存储</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="mt-8 glow-card tech-border rounded-xl p-6 bg-gradient-to-br from-blue-900/30 to-purple-900/30">
+                        <h4 class="font-bold text-white text-xl mb-3">学习建议</h4>
+                        <p class="text-cyan-200 italic">
+                            "通过本项目的实践，可以深入理解C语言的编程思想和实践技巧，为进一步学习高级编程语言打下坚实基础。"
+                        </p>
+                        <div class="mt-4 flex items-center">
+                            <div class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center mr-3">
+                                <i class="fas fa-user-graduate text-cyan-300"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-300">C语言教学专家建议</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="copyright">
-                <p>&copy; 2023 猎枭一号项目小组. 保留所有权利.</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-4 md:px-8 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center">
+                <h3 class="text-2xl font-bold text-white mb-2 font-orbitron">
+                    C语言图书管理系统
+                </h3>
+                <p class="text-gray-400 max-w-2xl mx-auto mb-8">
+                    一个功能全面的C语言教学项目，帮助学习者掌握链表操作、文件IO和用户界面设计等核心编程概念
+                </p>
+                <div class="flex justify-center space-x-4 mb-8">
+                    <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-neonBlue transition">
+                        <i class="fab fa-github text-white"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-blue-500 transition">
+                        <i class="fab fa-codepen text-white"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-purple-500 transition">
+                        <i class="fas fa-book text-white"></i>
+                    </a>
+                </div>
+                <p class="text-gray-500 text-sm">
+                    © 2023 C语言图书管理系统教学指南 | 编程教育实践项目
+                </p>
             </div>
         </div>
     </footer>
 
-    <script>
-        // 平滑滚动
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                
-                const targetId = this.getAttribute('href');
-                const targetElement = document.querySelector(targetId);
-                
-                window.scrollTo({
-                    top: targetElement.offsetTop - 80,
-                    behavior: 'smooth'
-                });
-            });
-        });
-        
-        // 导航栏背景变化
-        window.addEventListener('scroll', function() {
-            const header = document.querySelector('header');
-            if (window.scrollY > 50) {
-                header.style.backgroundColor = 'rgba(42, 67, 101, 0.95)';
-            } else {
-                header.style.backgroundColor = 'var(--primary)';
-            }
-        });
-    </script>
+    <!-- Back to Top -->
+    <a href="#" class="fixed bottom-6 right-6 w-12 h-12 bg-gradient-to-r from-neonBlue to-neonPurple rounded-full flex items-center justify-center text-white shadow-lg pulse">
+        <i class="fas fa-arrow-up"></i>
+    </a>
 </body>
 </html>
-
