@@ -1,688 +1,164 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>C语言图书管理系统 - 教学指南</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
-    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        techBlue: '#0f172a',
-                        neonBlue: '#3b82f6',
-                        neonPurple: '#8b5cf6',
-                        accent: '#ec4899',
-                        highlight: '#06b6d4'
-                    },
-                    fontFamily: {
-                        orbitron: ['Orbitron', 'sans-serif'],
-                        inter: ['Inter', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'monospace']
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        body {
-            background-color: #0a1121;
-            color: #e2e8f0;
-            font-family: 'Inter', sans-serif;
-            overflow-x: hidden;
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.1) 0%, transparent 20%),
-                radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 20%),
-                linear-gradient(to bottom, #0a1121, #0f172a);
-        }
-        
-        .tech-border {
-            border: 1px solid rgba(59, 130, 246, 0.3);
-            box-shadow: 0 0 15px rgba(59, 130, 246, 0.2), 
-                        inset 0 0 10px rgba(59, 130, 246, 0.1);
-        }
-        
-        .neon-text {
-            text-shadow: 0 0 5px rgba(59, 130, 246, 0.7),
-                         0 0 10px rgba(59, 130, 246, 0.5);
-        }
-        
-        .glow-card {
-            transition: all 0.3s ease;
-            background: rgba(15, 23, 42, 0.7);
-            backdrop-filter: blur(10px);
-        }
-        
-        .glow-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
-        }
-        
-        .code-block {
-            background: #1e293b;
-            border-left: 3px solid #3b82f6;
-            font-family: 'JetBrains Mono', monospace;
-        }
-        
-        .feature-icon {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            margin-bottom: 15px;
-        }
-        
-        .circuit-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                linear-gradient(rgba(59, 130, 246, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(59, 130, 246, 0.05) 1px, transparent 1px);
-            background-size: 30px 30px;
-            z-index: -1;
-            opacity: 0.3;
-        }
-        
-        .book-3d {
-            transform: perspective(1000px) rotateY(-10deg) rotateX(5deg);
-            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.4);
-            border-radius: 8px;
-            transition: transform 0.4s ease;
-        }
-        
-        .book-3d:hover {
-            transform: perspective(1000px) rotateY(0deg) rotateX(0deg);
-        }
-        
-        .pulse {
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
-        }
-        
-        .step-card {
-            counter-increment: step-counter;
-            position: relative;
-            padding-left: 80px;
-        }
-        
-        .step-card::before {
-            content: counter(step-counter);
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 24px;
-            font-weight: bold;
-        }
-        
-        .scroll-down {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            animation: bounce 2s infinite;
-        }
-        
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {transform: translateY(0) translateX(-50%);}
-            40% {transform: translateY(-20px) translateX(-50%);}
-            60% {transform: translateY(-10px) translateX(-50%);}
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>教室人脸签到系统 — 项目介绍</title>
+  <style>
+    :root{
+      --bg:#f7f9fc; --card:#ffffff; --muted:#6b7280;
+      --accent:#2563eb; --accent-2:#06b6d4; --radius:10px;
+      font-family: "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+    }
+    body{margin:0;background:var(--bg);color:#0f172a;line-height:1.6}
+    header{background:linear-gradient(90deg,#0ea5e9 0%,#6366f1 100%);color:#fff;padding:36px 20px}
+    .container{max-width:980px;margin: -28px auto 60px;padding:20px}
+    .card{background:var(--card);border-radius:var(--radius);box-shadow:0 6px 18px rgba(15,23,42,0.08);padding:20px;margin-bottom:18px}
+    h1{margin:0;font-size:24px}
+    p.lead{color:#e6f6ff;margin-top:8px}
+    h2{font-size:18px;margin:0 0 12px}
+    ul{margin:0 0 12px 18px}
+    .meta{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px;color:var(--muted);font-size:14px}
+    .badge{background:#eef2ff;color:#1e3a8a;padding:6px 10px;border-radius:8px;font-weight:600}
+    .grid{display:grid;grid-template-columns:1fr 320px;gap:18px}
+    @media (max-width:880px){.grid{grid-template-columns:1fr}}
+    .aside .small{font-size:13px;color:var(--muted)}
+    .btn{display:inline-block;background:var(--accent);color:#fff;padding:10px 14px;border-radius:8px;text-decoration:none;font-weight:600}
+    .btn.secondary{background:transparent;color:var(--accent);border:1px solid rgba(37,99,235,0.12)}
+    .section-title{display:flex;justify-content:space-between;align-items:center}
+    details{margin-bottom:10px}
+    code{background:#f1f5f9;padding:2px 6px;border-radius:6px;font-size:13px}
+    footer{max-width:980px;margin:0 auto 40px;padding:0 20px;color:var(--muted);font-size:13px}
+    .features{display:flex;flex-wrap:wrap;gap:10px}
+    .feature{background:#f8fafc;border-radius:8px;padding:8px 10px;color:var(--muted);font-weight:600}
+  </style>
 </head>
-<body class="relative min-h-screen">
-    <div class="circuit-bg"></div>
-    
-    <!-- Hero Section -->
-    <header class="relative pt-24 pb-32 px-4 md:px-8 overflow-hidden">
-        <div class="max-w-7xl mx-auto">
-            <div class="flex flex-col md:flex-row items-center">
-                <div class="md:w-1/2 mb-12 md:mb-0 z-10">
-                    <h1 class="text-4xl md:text-6xl font-bold mb-6 font-orbitron neon-text text-white">
-                        C语言图书管理系统
-                    </h1>
-                    <h2 class="text-xl md:text-2xl text-cyan-300 mb-8 font-orbitron">
-                        保姆式教学指南 - 从入门到精通
-                    </h2>
-                    <p class="text-lg text-gray-300 mb-8 max-w-2xl">
-                        一个功能全面的C语言实战项目，涵盖链表操作、文件I/O、用户界面设计等核心编程概念，是学习C语言的完美教学案例。
-                    </p>
-                    <div class="flex flex-wrap gap-4">
-                        <a href="#features" class="px-6 py-3 bg-gradient-to-r from-neonBlue to-neonPurple rounded-lg font-semibold text-white hover:opacity-90 transition">
-                            <i class="fas fa-book mr-2"></i>功能特性
-                        </a>
-                        <a href="#code" class="px-6 py-3 tech-border rounded-lg font-semibold text-neonBlue hover:bg-opacity-10 hover:bg-neonBlue transition">
-                            <i class="fas fa-code mr-2"></i>代码解析
-                        </a>
-                    </div>
-                </div>
-                <div class="md:w-1/2 flex justify-center z-10">
-                    <div class="relative">
-                        <div class="book-3d w-64 h-80 bg-gradient-to-br from-blue-900 to-purple-900 relative overflow-hidden">
-                            <div class="absolute inset-0 flex items-center justify-center">
-                                <div class="text-center p-6">
-                                    <i class="fas fa-book-open text-6xl text-cyan-300 mb-4"></i>
-                                    <h3 class="text-xl font-bold text-white font-orbitron">C语言图书系统</h3>
-                                    <p class="text-cyan-200 mt-2">链表 + 文件I/O</p>
-                                </div>
-                            </div>
-                            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-cyan-400 to-blue-500"></div>
-                        </div>
-                        <div class="absolute -top-6 -right-6 w-32 h-32 bg-purple-600 rounded-full opacity-20 blur-xl"></div>
-                        <div class="absolute -bottom-6 -left-6 w-40 h-40 bg-blue-600 rounded-full opacity-20 blur-xl"></div>
-                    </div>
-                </div>
-            </div>
+<body>
+  <header>
+    <div class="container">
+      <h1>教室人脸签到系统（项目介绍）</h1>
+      <p class="lead">基于摄像头与人脸识别技术，实现教室出勤自动化管理的最小可行产品（MVP）。支持人脸检测、特征提取、识别比对、活体检测、签到去重与报表导出。</p>
+      <div class="meta">
+        <span class="badge">MVP</span>
+        <span>语言 / 技术：Python · FastAPI · OpenCV · face_recognition / insightface</span>
+        <span>部署：Edge（Raspberry/Jetson）或服务器（Docker）</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="grid">
+      <div>
+        <section class="card">
+          <div class="section-title">
+            <h2>项目概述</h2>
+          </div>
+          <p>本项目旨在为中小学校或培训机构提供一套轻量、可落地的教室人脸签到解决方案。通过摄像头实时识别在场学生并自动生成签到记录，减轻教师手工点名负担，同时支持签到报表、缺勤统计与基础防作弊能力。</p>
+
+          <h2>核心功能</h2>
+          <ul>
+            <li>人脸检测与对齐（静态图片 & 视频帧）</li>
+            <li>人脸特征提取与比对（Embedding）</li>
+            <li>签到记录：按节次/时间窗去重、CSV 导出</li>
+            <li>活体检测（基础动作检测/眨眼/张嘴）</li>
+            <li>管理端：学生注册（Enrollment）、签到查询</li>
+            <li>部署支持：Docker 一键启动 + 可选边缘部署方案</li>
+          </ul>
+
+          <h2>系统架构（简要）</h2>
+          <ul>
+            <li>摄像头采集层（Edge）：RTSP/USB 摄像头，负责采集与本地预处理</li>
+            <li>识别服务（可部署于边缘或云端）：人脸检测 → 对齐 → 提取 embedding → 比对</li>
+            <li>应用后端：FastAPI 提供 enroll/recognize/attendance API、存储（SQLite/Postgres）</li>
+            <li>前端展示：简单的管理界面与实时识别页面（HTML/JS 或 React）</li>
+          </ul>
+
+          <h2>技术选型（建议）</h2>
+          <div class="features">
+            <div class="feature">Python 3.9+</div>
+            <div class="feature">OpenCV</div>
+            <div class="feature">insightface / face_recognition</div>
+            <div class="feature">FastAPI + Uvicorn</div>
+            <div class="feature">SQLite / PostgreSQL</div>
+            <div class="feature">Docker</div>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>隐私与合规</h2>
+          <ul>
+            <li>优先存储人脸 <strong>embedding</strong>，尽量不长期保存原始照片。</li>
+            <li>数据最小化与保留策略：建议默认保留 1 年，超期删除或匿名化。</li>
+            <li>接口与数据访问采用 HTTPS 与认证（建议 JWT）。</li>
+            <li>在部署前须取得学校/家长的书面同意并遵守当地数据保护法规。</li>
+          </ul>
+        </section>
+
+        <section class="card">
+          <h2>运行示例（快速开始）</h2>
+          <p>开发环境准备后，示例命令（项目根目录）：</p>
+          <ul>
+            <li><code>python -m venv .venv</code>，<code>source .venv/bin/activate</code></li>
+            <li><code>pip install -r requirements.txt</code></li>
+            <li>启动开发服务器：<code>uvicorn app:app --reload --host 0.0.0.0 --port 8000</code></li>
+            <li>用浏览器打开：<code>http://localhost:8000</code> （或前端页面）</li>
+          </ul>
+          <p>常见 API：</p>
+          <ul>
+            <li>POST /api/enroll — 注册学生（student_id + images）</li>
+            <li>POST /api/recognize — 上传帧并返回识别结果</li>
+            <li>GET /api/attendance — 查询签到记录</li>
+          </ul>
+        </section>
+      </div>
+
+      <aside class="aside">
+        <div class="card">
+          <h2>项目亮点</h2>
+          <ul>
+            <li>零基础可复现的教学路线与代码示例</li>
+            <li>支持边缘部署，降低带宽与隐私风险</li>
+            <li>模块化设计，易替换检测/识别模型</li>
+            <li>包含活体检测与签到去重策略</li>
+          </ul>
+          <div style="margin-top:12px">
+            <a class="btn" href="#" onclick="alert('请替换为你的仓库地址')">查看源码</a>
+            <a class="btn secondary" href="#" onclick="alert('下载计划见仓库或团队共享')">下载学习计划</a>
+          </div>
         </div>
-        <div class="scroll-down text-neonBlue text-4xl">
-            <i class="fas fa-chevron-down"></i>
+
+        <div class="card">
+          <h2>项目版本与联系方式</h2>
+          <p class="small"><strong>版本：</strong>v0.1 (MVP)</p>
+          <p class="small"><strong>作者：</strong>你的名字 / 团队</p>
+          <p class="small"><strong>联系邮箱：</strong>you@example.com</p>
+          <p class="small">欢迎反馈 bug、功能需求或参与改进。</p>
         </div>
-    </header>
 
-    <!-- Key Stats -->
-    <section class="py-12 px-4 md:px-8">
-        <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div class="glow-card tech-border rounded-xl p-6 text-center">
-                <div class="text-4xl font-bold text-cyan-300 font-orbitron">9+</div>
-                <div class="text-gray-300 mt-2">核心功能</div>
-            </div>
-            <div class="glow-card tech-border rounded-xl p-6 text-center">
-                <div class="text-4xl font-bold text-cyan-300 font-orbitron">4</div>
-                <div class="text-gray-300 mt-2">核心模块</div>
-            </div>
-            <div class="glow-card tech-border rounded-xl p-6 text-center">
-                <div class="text-4xl font-bold text-cyan-300 font-orbitron">3</div>
-                <div class="text-gray-300 mt-2">数据结构</div>
-            </div>
-            <div class="glow-card tech-border rounded-xl p-6 text-center">
-                <div class="text-4xl font-bold text-cyan-300 font-orbitron">100%</div>
-                <div class="text-gray-300 mt-2">教学适用</div>
-            </div>
+        <div class="card">
+          <h2>扩展建议</h2>
+          <ul>
+            <li>替换为 ArcFace + RetinaFace 提升识别精度</li>
+            <li>使用 ONNX/TensorRT 进行推理加速</li>
+            <li>引入集中式服务 + 边缘裁剪架构支持大规模部署</li>
+            <li>完善活体检测（单目深度估计或挑战式活体）</li>
+          </ul>
         </div>
-    </section>
+      </aside>
+    </div>
+  </main>
 
-    <!-- Features Section -->
-    <section id="features" class="py-16 px-4 md:px-8">
-        <div class="max-w-7xl mx-auto">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4 font-orbitron">
-                    系统核心特性
-                </h2>
-                <div class="w-20 h-1 bg-gradient-to-r from-neonBlue to-neonPurple mx-auto"></div>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Feature 1 -->
-                <div class="glow-card tech-border rounded-xl p-6">
-                    <div class="feature-icon">
-                        <i class="fas fa-book"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold text-white mb-3">图书管理功能</h3>
-                    <p class="text-gray-300">
-                        完整的增删改查(CRUD)功能，支持多条件搜索，包括书名、作者、ISBN等，提供清晰的表格展示界面。
-                    </p>
-                    <ul class="mt-4 space-y-2">
-                        <li class="flex items-center text-cyan-200">
-                            <i class="fas fa-check-circle mr-2 text-green-400"></i>
-                            添加/删除/修改图书信息
-                        </li>
-                        <li class="flex items-center text-cyan-200">
-                            <i class="fas fa-check-circle mr-2 text-green-400"></i>
-                            多条件高级搜索
-                        </li>
-                        <li class="flex items-center text-cyan-200">
-                            <i class="fas fa-check-circle mr-2 text-green-400"></i>
-                            库存数量管理
-                        </li>
-                    </ul>
-                </div>
-                
-                <!-- Feature 2 -->
-                <div class="glow-card tech-border rounded-xl p-6">
-                    <div class="feature-icon">
-                        <i class="fas fa-database"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold text-white mb-3">数据持久化</h3>
-                    <p class="text-gray-300">
-                        使用二进制文件存储技术，确保数据永久保存，支持数据的导入导出功能。
-                    </p>
-                    <ul class="mt-4 space-y-2">
-                        <li class="flex items-center text-cyan-200">
-                            <i class="fas fa-check-circle mr-2 text-green-400"></i>
-                            二进制文件存储
-                        </li>
-                        <li class="flex items-center text-cyan-200">
-                            <i class="fas fa-check-circle mr-2 text-green-400"></i>
-                            运行时数据自动保存
-                        </li>
-                        <li class="flex items-center text-cyan-200">
-                            <i class="fas fa-check-circle mr-2 text-green-400"></i>
-                            退出时数据保存确认
-                        </li>
-                    </ul>
-                </div>
-                
-                <!-- Feature 3 -->
-                <div class="glow-card tech-border rounded-xl p-6">
-                    <div class="feature-icon">
-                        <i class="fas fa-user-lock"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold text-white mb-3">用户管理系统</h3>
-                    <p class="text-gray-300">
-                        完整的用户账号系统，支持注册、登录功能，区分管理员和普通用户权限。
-                    </p>
-                    <ul class="mt-4 space-y-2">
-                        <li class="flex items-center text-cyan-200">
-                            <i class="fas fa-check-circle mr-2 text-green-400"></i>
-                            用户注册与登录
-                        </li>
-                        <li class="flex items-center text-cyan-200">
-                            <i class="fas fa-check-circle mr-2 text-green-400"></i>
-                            管理员权限控制
-                        </li>
-                        <li class="flex items-center text-cyan-200">
-                            <i class="fas fa-check-circle mr-2 text-green-400"></i>
-                            用户数据加密存储
-                        </li>
-                    </ul>
-                </div>
-                
-                <!-- Feature 4 -->
-                <div class="glow-card tech-border rounded-xl p-6">
-                    <div class="feature-icon">
-                        <i class="fas fa-sitemap"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold text-white mb-3">模块化架构</h3>
-                    <p class="text-gray-300">
-                        清晰的代码结构，分离为多个模块，便于教学和理解系统设计原理。
-                    </p>
-                    <ul class="mt-4 space-y-2">
-                        <li class="flex items-center text-cyan-200">
-                            <i class="fas fa-check-circle mr-2 text-green-400"></i>
-                            头文件(book.h)
-                        </li>
-                        <li class="flex items-center text-cyan-200">
-                            <i class="fas fa-check-circle mr-2 text-green-400"></i>
-                            核心功能(book.c)
-                        </li>
-                        <li class="flex items-center text-cyan-200">
-                            <i class="fas fa-check-circle mr-2 text-green-400"></i>
-                            文件操作(file.c)
-                        </li>
-                        <li class="flex items-center text-cyan-200">
-                            <i class="fas fa-check-circle mr-2 text-green-400"></i>
-                            主程序(main.c)
-                        </li>
-                    </ul>
-                </div>
-                
-                <!-- Feature 5 -->
-                <div class="glow-card tech-border rounded-xl p-6">
-                    <div class="feature-icon">
-                        <i class="fas fa-project-diagram"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold text-white mb-3">数据结构与算法</h3>
-                    <p class="text-gray-300">
-                        使用单链表存储图书信息，实现高效的数据操作和管理。
-                    </p>
-                    <ul class="mt-4 space-y-2">
-                        <li class="flex items-center text-cyan-200">
-                            <i class="fas fa-check-circle mr-2 text-green-400"></i>
-                            链表数据结构
-                        </li>
-                        <li class="flex items-center text-cyan-200">
-                            <i class="fas fa-check-circle mr-2 text-green-400"></i>
-                            动态内存管理
-                        </li>
-                        <li class="flex items-center text-cyan-200">
-                            <i class="fas fa-check-circle mr-2 text-green-400"></i>
-                            高效查找算法
-                        </li>
-                    </ul>
-                </div>
-                
-                <!-- Feature 6 -->
-                <div class="glow-card tech-border rounded-xl p-6">
-                    <div class="feature-icon">
-                        <i class="fas fa-graduation-cap"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold text-white mb-3">教学价值</h3>
-                    <p class="text-gray-300">
-                        完美涵盖C语言核心知识点，是学习编程的理想实践项目。
-                    </p>
-                    <ul class="mt-4 space-y-2">
-                        <li class="flex items-center text-cyan-200">
-                            <i class="fas fa-check-circle mr-2 text-green-400"></i>
-                            C语言语法实践
-                        </li>
-                        <li class="flex items-center text-cyan-200">
-                            <i class="fas fa-check-circle mr-2 text-green-400"></i>
-                            数据结构应用
-                        </li>
-                        <li class="flex items-center text-cyan-200">
-                            <i class="fas fa-check-circle mr-2 text-green-400"></i>
-                            文件I/O操作
-                        </li>
-                        <li class="flex items-center text-cyan-200">
-                            <i class="fas fa-check-circle mr-2 text-green-400"></i>
-                            模块化编程思想
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
+  <footer>
+    <div class="container">
+      <p>© 教室人脸签到系统 项目介绍 · 版本 v0.1 · 本页面仅为项目简介模板，具体实现请参考仓库与技术文档。</p>
+    </div>
+  </footer>
 
-    <!-- Code Structure -->
-    <section id="code" class="py-16 px-4 md:px-8 bg-gradient-to-b from-techBlue to-blue-900/20">
-        <div class="max-w-7xl mx-auto">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4 font-orbitron">
-                    系统架构与代码解析
-                </h2>
-                <div class="w-20 h-1 bg-gradient-to-r from-neonBlue to-neonPurple mx-auto"></div>
-                <p class="text-gray-400 max-w-2xl mx-auto mt-4">
-                    清晰的文件结构与模块化设计，便于理解和教学
-                </p>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div>
-                    <h3 class="text-2xl font-semibold text-white mb-6 font-orbitron">核心文件结构</h3>
-                    
-                    <div class="glow-card tech-border rounded-xl p-6 mb-6">
-                        <div class="flex items-center mb-4">
-                            <i class="fas fa-folder-open text-cyan-400 text-xl mr-3"></i>
-                            <h4 class="text-lg font-semibold text-white">项目目录结构</h4>
-                        </div>
-                        <pre class="code-block rounded-lg p-4 text-sm overflow-x-auto">
-ai/
-├── src/
-│   ├── main.c        # 主程序和用户界面
-│   ├── book.c        # 核心功能实现
-│   ├── book.h        # 头文件，定义结构体和函数
-│   ├── file.c        # 文件操作实现
-│   ├── bin/          # 编译后的可执行文件
-│   ├── algorithm/    # 算法相关文件
-│   ├── makefile      # 编译配置文件
-│   ├── README.md     # 项目说明文档
-│   └── books.dat     # 图书数据文件（运行时生成）</pre>
-                    </div>
-                    
-                    <div class="glow-card tech-border rounded-xl p-6">
-                        <div class="flex items-center mb-4">
-                            <i class="fas fa-code text-purple-400 text-xl mr-3"></i>
-                            <h4 class="text-lg font-semibold text-white">数据结构定义</h4>
-                        </div>
-                        <pre class="code-block rounded-lg p-4 text-sm overflow-x-auto">
-// 图书结构体
-struct Book {
-    char title[MAX_TITLE_LEN];   // 书名
-    char author[MAX_AUTHOR_LEN]; // 作者
-    char publisher[MAX_PUBLISHER_LEN]; // 出版社
-    char ISBN[MAX_ISBN_LEN];     // ISBN
-    char genre[MAX_GENRE_LEN];   // 分类
-    float price;                 // 价格
-    int year;                    // 出版年份
-    int quantity;                // 库存数量
-};
-
-// 用户结构体
-struct User {
-    char username[MAX_USERNAME_LEN]; // 用户名
-    char password[MAX_PASSWORD_LEN]; // 密码
-    int isAdmin;                     // 是否为管理员
-};
-
-// 链表节点结构体
-struct BookNode {
-    Book book;                     // 图书信息
-    struct BookNode* next;         // 指向下一个节点的指针
-};</pre>
-                    </div>
-                </div>
-                
-                <div>
-                    <h3 class="text-2xl font-semibold text-white mb-6 font-orbitron">核心功能实现</h3>
-                    
-                    <div class="glow-card tech-border rounded-xl p-6 mb-6">
-                        <div class="flex items-center mb-4">
-                            <i class="fas fa-book text-green-400 text-xl mr-3"></i>
-                            <h4 class="text-lg font-semibold text-white">添加图书功能</h4>
-                        </div>
-                        <pre class="code-block rounded-lg p-4 text-sm overflow-x-auto">
-void addBook(BookManager* manager) {
-    Book newBook;
-    // 输入图书信息（验证逻辑）
-    inputString("书名：", newBook.title, MAX_TITLE_LEN);
-    // ISBN验证
-    do {
-        inputString("ISBN：", newBook.ISBN, MAX_ISBN_LEN);
-    } while (!isValidISBN(newBook.ISBN) || 
-             findBookByISBN(manager, newBook.ISBN) != NULL);
-    
-    // 创建节点并添加到链表头部
-    BookNode* newNode = createBookNode(&newBook);
-    newNode->next = manager->head;
-    manager->head = newNode;
-    manager->count++;
-    printf("图书添加成功!\n");
-}</pre>
-                    </div>
-                    
-                    <div class="glow-card tech-border rounded-xl p-6">
-                        <div class="flex items-center mb-4">
-                            <i class="fas fa-save text-yellow-400 text-xl mr-3"></i>
-                            <h4 class="text-lg font-semibold text-white">数据持久化</h4>
-                        </div>
-                        <pre class="code-block rounded-lg p-4 text-sm overflow-x-auto">
-// 保存数据到文件
-void saveToFile(BookManager *manager) {
-    FILE *file = fopen(FILENAME, "wb");
-    fwrite(&manager->count, sizeof(int), 1, file);
-    
-    BookNode *current = manager->head;
-    while (current != NULL) {
-        fwrite(&current->book, sizeof(Book), 1, file);
-        current = current->next;
-    }
-    
-    fclose(file);
-    printf("数据保存成功!\n");
-}
-
-// 从文件加载数据
-void loadFromFile(BookManager *manager) {
-    FILE *file = fopen(FILENAME, "rb");
-    // 先销毁现有链表
-    destroyManager(manager);
-    
-    int count;
-    fread(&count, sizeof(int), 1, file);
-    
-    for (int i = 0; i < count; i++) {
-        Book book;
-        fread(&book, sizeof(Book), 1, file);
-        
-        BookNode *newNode = createBookNode(&book);
-        newNode->next = manager->head;
-        manager->head = newNode;
-        manager->count++;
-    }
-    
-    fclose(file);
-    printf("数据加载成功！共加载 %d 本图书。\n", manager->count);
-}</pre>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Learning Path -->
-    <section class="py-16 px-4 md:px-8">
-        <div class="max-w-7xl mx-auto">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4 font-orbitron">
-                    学习路径与教学价值
-                </h2>
-                <div class="w-20 h-1 bg-gradient-to-r from-neonBlue to-neonPurple mx-auto"></div>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
-                <div>
-                    <h3 class="text-2xl font-semibold text-cyan-300 mb-6">C语言核心知识点</h3>
-                    
-                    <div class="space-y-8">
-                        <div class="step-card">
-                            <h4 class="text-xl font-semibold text-white mb-2">数据结构与内存管理</h4>
-                            <p class="text-gray-300">
-                                通过链表实现图书存储，学习指针、动态内存分配(malloc/free)、结构体等核心概念。
-                            </p>
-                        </div>
-                        
-                        <div class="step-card">
-                            <h4 class="text-xl font-semibold text-white mb-2">文件I/O操作</h4>
-                            <p class="text-gray-300">
-                                掌握二进制文件的读写操作，实现数据持久化存储，学习文件操作的基本流程。
-                            </p>
-                        </div>
-                        
-                        <div class="step-card">
-                            <h4 class="text-xl font-semibold text-white mb-2">模块化编程</h4>
-                            <p class="text-gray-300">
-                                理解头文件(.h)和源文件(.c)的分离，学习如何设计清晰的程序架构。
-                            </p>
-                        </div>
-                        
-                        <div class="step-card">
-                            <h4 class="text-xl font-semibold text-white mb-2">用户输入与验证</h4>
-                            <p class="text-gray-300">
-                                实现健壮的用户输入处理，包括输入验证和错误处理机制。
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div>
-                    <h3 class="text-2xl font-semibold text-cyan-300 mb-6">项目扩展方向</h3>
-                    
-                    <div class="glow-card tech-border rounded-xl p-6">
-                        <ul class="space-y-4">
-                            <li class="flex items-start">
-                                <i class="fas fa-arrow-circle-right text-green-400 mt-1 mr-3"></i>
-                                <div>
-                                    <h4 class="font-semibold text-white">图书借阅系统</h4>
-                                    <p class="text-gray-300">添加借阅记录和归还管理功能</p>
-                                </div>
-                            </li>
-                            
-                            <li class="flex items-start">
-                                <i class="fas fa-arrow-circle-right text-green-400 mt-1 mr-3"></i>
-                                <div>
-                                    <h4 class="font-semibold text-white">权限管理系统</h4>
-                                    <p class="text-gray-300">实现不同用户角色的权限管理</p>
-                                </div>
-                            </li>
-                            
-                            <li class="flex items-start">
-                                <i class="fas fa-arrow-circle-right text-green-400 mt-1 mr-3"></i>
-                                <div>
-                                    <h4 class="font-semibold text-white">数据库集成</h4>
-                                    <p class="text-gray-300">使用SQLite或MySQL替代文件存储</p>
-                                </div>
-                            </li>
-                            
-                            <li class="flex items-start">
-                                <i class="fas fa-arrow-circle-right text-green-400 mt-1 mr-3"></i>
-                                <div>
-                                    <h4 class="font-semibold text-white">图形界面</h4>
-                                    <p class="text-gray-300">使用GTK或Qt开发图形用户界面</p>
-                                </div>
-                            </li>
-                            
-                            <li class="flex items-start">
-                                <i class="fas fa-arrow-circle-right text-green-400 mt-1 mr-3"></i>
-                                <div>
-                                    <h4 class="font-semibold text-white">数据加密</h4>
-                                    <p class="text-gray-300">对用户密码和敏感数据进行加密存储</p>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                    
-                    <div class="mt-8 glow-card tech-border rounded-xl p-6 bg-gradient-to-br from-blue-900/30 to-purple-900/30">
-                        <h4 class="font-bold text-white text-xl mb-3">学习建议</h4>
-                        <p class="text-cyan-200 italic">
-                            "通过本项目的实践，可以深入理解C语言的编程思想和实践技巧，为进一步学习高级编程语言打下坚实基础。"
-                        </p>
-                        <div class="mt-4 flex items-center">
-                            <div class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center mr-3">
-                                <i class="fas fa-user-graduate text-cyan-300"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-300">C语言教学专家建议</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="py-12 px-4 md:px-8 border-t border-gray-800">
-        <div class="max-w-7xl mx-auto">
-            <div class="text-center">
-                <h3 class="text-2xl font-bold text-white mb-2 font-orbitron">
-                    C语言图书管理系统
-                </h3>
-                <p class="text-gray-400 max-w-2xl mx-auto mb-8">
-                    一个功能全面的C语言教学项目，帮助学习者掌握链表操作、文件IO和用户界面设计等核心编程概念
-                </p>
-                <div class="flex justify-center space-x-4 mb-8">
-                    <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-neonBlue transition">
-                        <i class="fab fa-github text-white"></i>
-                    </a>
-                    <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-blue-500 transition">
-                        <i class="fab fa-codepen text-white"></i>
-                    </a>
-                    <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-purple-500 transition">
-                        <i class="fas fa-book text-white"></i>
-                    </a>
-                </div>
-                <p class="text-gray-500 text-sm">
-                    © 2023 C语言图书管理系统教学指南 | 编程教育实践项目
-                </p>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Back to Top -->
-    <a href="#" class="fixed bottom-6 right-6 w-12 h-12 bg-gradient-to-r from-neonBlue to-neonPurple rounded-full flex items-center justify-center text-white shadow-lg pulse">
-        <i class="fas fa-arrow-up"></i>
-    </a>
+  <script>
+    // 小交互：折叠所有 details（如后续扩展可使用）
+    document.querySelectorAll('details').forEach(d => d.addEventListener('toggle', e => {}));
+    // 提示替换链接
+    // （在实际部署时把 href 替换为你的 GitHub 仓库或文档地址）
+  </script>
 </body>
 </html>
