@@ -3,161 +3,192 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>教室人脸签到系统 — 项目介绍</title>
+  <title>摄像头预览（占位）</title>
   <style>
     :root{
-      --bg:#f7f9fc; --card:#ffffff; --muted:#6b7280;
-      --accent:#2563eb; --accent-2:#06b6d4; --radius:10px;
-      font-family: "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      --bg:#f3f4f6;
+      --card:#fff;
+      --muted:#6b7280;
+      --accent:#3b82f6;
     }
-    body{margin:0;background:var(--bg);color:#0f172a;line-height:1.6}
-    header{background:linear-gradient(90deg,#0ea5e9 0%,#6366f1 100%);color:#fff;padding:36px 20px}
-    .container{max-width:980px;margin: -28px auto 60px;padding:20px}
-    .card{background:var(--card);border-radius:var(--radius);box-shadow:0 6px 18px rgba(15,23,42,0.08);padding:20px;margin-bottom:18px}
-    h1{margin:0;font-size:24px}
-    p.lead{color:#e6f6ff;margin-top:8px}
-    h2{font-size:18px;margin:0 0 12px}
-    ul{margin:0 0 12px 18px}
-    .meta{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px;color:var(--muted);font-size:14px}
-    .badge{background:#eef2ff;color:#1e3a8a;padding:6px 10px;border-radius:8px;font-weight:600}
-    .grid{display:grid;grid-template-columns:1fr 320px;gap:18px}
-    @media (max-width:880px){.grid{grid-template-columns:1fr}}
-    .aside .small{font-size:13px;color:var(--muted)}
-    .btn{display:inline-block;background:var(--accent);color:#fff;padding:10px 14px;border-radius:8px;text-decoration:none;font-weight:600}
-    .btn.secondary{background:transparent;color:var(--accent);border:1px solid rgba(37,99,235,0.12)}
-    .section-title{display:flex;justify-content:space-between;align-items:center}
-    details{margin-bottom:10px}
-    code{background:#f1f5f9;padding:2px 6px;border-radius:6px;font-size:13px}
-    footer{max-width:980px;margin:0 auto 40px;padding:0 20px;color:var(--muted);font-size:13px}
-    .features{display:flex;flex-wrap:wrap;gap:10px}
-    .feature{background:#f8fafc;border-radius:8px;padding:8px 10px;color:var(--muted);font-weight:600}
+    html,body{
+      height:100%;
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue","Noto Sans",sans-serif;
+      background:var(--bg);
+      color:#111827;
+    }
+    .wrap{
+      min-height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      box-sizing:border-box;
+    }
+    .card{
+      width:100%;
+      max-width:720px;
+      background:var(--card);
+      border-radius:12px;
+      box-shadow:0 6px 18px rgba(15,23,42,0.08);
+      padding:20px;
+      box-sizing:border-box;
+      text-align:center;
+    }
+    .preview{
+      position:relative;
+      width:100%;
+      padding-top:56.25%; /* 16:9 */
+      background:linear-gradient(180deg,#e6eefc,#f8fbff);
+      border-radius:8px;
+      overflow:hidden;
+      margin-bottom:14px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    video{
+      position:absolute;
+      top:0; left:0; width:100%; height:100%;
+      object-fit:cover;
+      background:#000;
+    }
+    .placeholder{
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex-direction:column;
+      gap:8px;
+      color:var(--muted);
+      padding:12px;
+    }
+    .controls{
+      display:flex;
+      gap:8px;
+      justify-content:center;
+      margin-top:6px;
+    }
+    button{
+      border:0;
+      background:var(--accent);
+      color:white;
+      padding:8px 12px;
+      border-radius:8px;
+      cursor:pointer;
+      font-weight:600;
+    }
+    button.ghost{
+      background:transparent;
+      color:var(--accent);
+      border:1px solid rgba(59,130,246,0.12);
+    }
+    .note{
+      font-size:13px;
+      color:var(--muted);
+      margin-top:10px;
+    }
+    .error{
+      color:#b91c1c;
+      font-weight:600;
+    }
   </style>
 </head>
 <body>
-  <header>
-    <div class="container">
-      <h1>教室人脸签到系统（项目介绍）</h1>
-      <p class="lead">基于摄像头与人脸识别技术，实现教室出勤自动化管理的最小可行产品（MVP）。支持人脸检测、特征提取、识别比对、活体检测、签到去重与报表导出。</p>
-      <div class="meta">
-        <span class="badge">MVP</span>
-        <span>语言 / 技术：Python · FastAPI · OpenCV · face_recognition / insightface</span>
-        <span>部署：Edge（Raspberry/Jetson）或服务器（Docker）</span>
-      </div>
-    </div>
-  </header>
+  <div class="wrap">
+    <div class="card" role="main">
+      <h2>摄像头预览（占位）</h2>
 
-  <main class="container">
-    <div class="grid">
-      <div>
-        <section class="card">
-          <div class="section-title">
-            <h2>项目概述</h2>
-          </div>
-          <p>本项目旨在为中小学校或培训机构提供一套轻量、可落地的教室人脸签到解决方案。通过摄像头实时识别在场学生并自动生成签到记录，减轻教师手工点名负担，同时支持签到报表、缺勤统计与基础防作弊能力。</p>
+      <div class="preview" id="preview">
+        <video id="video" playsinline autoplay muted></video>
 
-          <h2>核心功能</h2>
-          <ul>
-            <li>人脸检测与对齐（静态图片 & 视频帧）</li>
-            <li>人脸特征提取与比对（Embedding）</li>
-            <li>签到记录：按节次/时间窗去重、CSV 导出</li>
-            <li>活体检测（基础动作检测/眨眼/张嘴）</li>
-            <li>管理端：学生注册（Enrollment）、签到查询</li>
-            <li>部署支持：Docker 一键启动 + 可选边缘部署方案</li>
-          </ul>
+        <div class="placeholder" id="placeholder">
+          <!-- 简单占位图标（SVG） -->
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+            <rect width="24" height="24" rx="4" fill="#e6eefc"/>
+            <path d="M4 7h3l2-2h6l2 2h3v10H4V7z" fill="#93c5fd"/>
+            <circle cx="12" cy="12" r="3.5" fill="#bfdbfe"/>
+          </svg>
 
-          <h2>系统架构（简要）</h2>
-          <ul>
-            <li>摄像头采集层（Edge）：RTSP/USB 摄像头，负责采集与本地预处理</li>
-            <li>识别服务（可部署于边缘或云端）：人脸检测 → 对齐 → 提取 embedding → 比对</li>
-            <li>应用后端：FastAPI 提供 enroll/recognize/attendance API、存储（SQLite/Postgres）</li>
-            <li>前端展示：简单的管理界面与实时识别页面（HTML/JS 或 React）</li>
-          </ul>
-
-          <h2>技术选型（建议）</h2>
-          <div class="features">
-            <div class="feature">Python 3.9+</div>
-            <div class="feature">OpenCV</div>
-            <div class="feature">insightface / face_recognition</div>
-            <div class="feature">FastAPI + Uvicorn</div>
-            <div class="feature">SQLite / PostgreSQL</div>
-            <div class="feature">Docker</div>
-          </div>
-        </section>
-
-        <section class="card">
-          <h2>隐私与合规</h2>
-          <ul>
-            <li>优先存储人脸 <strong>embedding</strong>，尽量不长期保存原始照片。</li>
-            <li>数据最小化与保留策略：建议默认保留 1 年，超期删除或匿名化。</li>
-            <li>接口与数据访问采用 HTTPS 与认证（建议 JWT）。</li>
-            <li>在部署前须取得学校/家长的书面同意并遵守当地数据保护法规。</li>
-          </ul>
-        </section>
-
-        <section class="card">
-          <h2>运行示例（快速开始）</h2>
-          <p>开发环境准备后，示例命令（项目根目录）：</p>
-          <ul>
-            <li><code>python -m venv .venv</code>，<code>source .venv/bin/activate</code></li>
-            <li><code>pip install -r requirements.txt</code></li>
-            <li>启动开发服务器：<code>uvicorn app:app --reload --host 0.0.0.0 --port 8000</code></li>
-            <li>用浏览器打开：<code>http://localhost:8000</code> （或前端页面）</li>
-          </ul>
-          <p>常见 API：</p>
-          <ul>
-            <li>POST /api/enroll — 注册学生（student_id + images）</li>
-            <li>POST /api/recognize — 上传帧并返回识别结果</li>
-            <li>GET /api/attendance — 查询签到记录</li>
-          </ul>
-        </section>
+          <div id="placeholderText">等待摄像头启动或允许摄像头权限</div>
+        </div>
       </div>
 
-      <aside class="aside">
-        <div class="card">
-          <h2>项目亮点</h2>
-          <ul>
-            <li>零基础可复现的教学路线与代码示例</li>
-            <li>支持边缘部署，降低带宽与隐私风险</li>
-            <li>模块化设计，易替换检测/识别模型</li>
-            <li>包含活体检测与签到去重策略</li>
-          </ul>
-          <div style="margin-top:12px">
-            <a class="btn" href="https://github.com/bloonses/face-attendance.git">查看源码</a>
-            <a class="btn secondary" href="#" onclick="alert('下载计划见仓库或团队共享')">下载学习计划</a>
-          </div>
-        </div>
+      <div class="controls">
+        <button id="startBtn">启动摄像头</button>
+        <button id="stopBtn" class="ghost" disabled>停止摄像头</button>
+      </div>
 
-        <div class="card">
-          <h2>项目版本与联系方式</h2>
-          <p class="small"><strong>版本：</strong>v0.1 (MVP)</p>
-          <p class="small"><strong>作者：</strong>你的名字 / 团队</p>
-          <p class="small"><strong>联系邮箱：</strong>you@example.com</p>
-          <p class="small">欢迎反馈 bug、功能需求或参与改进。</p>
-        </div>
-
-        <div class="card">
-          <h2>扩展建议</h2>
-          <ul>
-            <li>替换为 ArcFace + RetinaFace 提升识别精度</li>
-            <li>使用 ONNX/TensorRT 进行推理加速</li>
-            <li>引入集中式服务 + 边缘裁剪架构支持大规模部署</li>
-            <li>完善活体检测（单目深度估计或挑战式活体）</li>
-          </ul>
-        </div>
-      </aside>
+      <div class="note">
+        在 localhost 上打开该页面并允许摄像头访问。若浏览器阻止访问或没有摄像头，页面会显示占位提示。
+      </div>
+      <div id="message" class="note"></div>
     </div>
-  </main>
-
-  <footer>
-    <div class="container">
-      <p>© 教室人脸签到系统 项目介绍 · 版本 v0.1 · 本页面仅为项目简介模板，具体实现请参考仓库与技术文档。</p>
-    </div>
-  </footer>
+  </div>
 
   <script>
-    // 小交互：折叠所有 details（如后续扩展可使用）
-    document.querySelectorAll('details').forEach(d => d.addEventListener('toggle', e => {}));
-    // 提示替换链接已应用：'查看源码' 将在当前页打开指定仓库地址
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const videoEl = document.getElementById('video');
+    const placeholder = document.getElementById('placeholder');
+    const messageEl = document.getElementById('message');
+
+    let stream = null;
+
+    function showMessage(text, isError=false){
+      messageEl.textContent = text || '';
+      messageEl.className = isError ? 'note error' : 'note';
+    }
+
+    async function startCamera(){
+      showMessage('');
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        showMessage('当前浏览器不支持摄像头访问。', true);
+        return;
+      }
+
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
+        videoEl.srcObject = stream;
+        videoEl.onloadedmetadata = () => videoEl.play().catch(()=>{});
+        placeholder.style.display = 'none';
+        startBtn.disabled = true;
+        stopBtn.disabled = false;
+        showMessage('摄像头已启动。');
+      } catch (err) {
+        console.error(err);
+        // 常见错误信息处理
+        if (err.name === 'NotAllowedError') {
+          showMessage('已拒绝摄像头权限，请在浏览器地址栏允许或在设置中启用权限。', true);
+        } else if (err.name === 'NotFoundError') {
+          showMessage('未找到可用摄像头设备。', true);
+        } else {
+          showMessage('启动摄像头失败：' + (err.message || err.name), true);
+        }
+        placeholder.style.display = 'flex';
+      }
+    }
+
+    function stopCamera(){
+      if (stream) {
+        const tracks = stream.getTracks();
+        tracks.forEach(t => t.stop());
+        stream = null;
+      }
+      videoEl.srcObject = null;
+      placeholder.style.display = 'flex';
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+      showMessage('摄像头已停止。');
+    }
+
+    startBtn.addEventListener('click', startCamera);
+    stopBtn.addEventListener('click', stopCamera);
+
+    // 如果想要页面加载时自动请求摄像头（不推荐在首次加载就请求），可以取消下面的注释：
+    // startCamera();
   </script>
 </body>
 </html>
