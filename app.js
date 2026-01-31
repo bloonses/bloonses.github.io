@@ -10,8 +10,7 @@ const snapshot = document.getElementById('snapshot');
 const startBtn = document.getElementById('startBtn');
 const stopBtn = document.getElementById('stopBtn');
 const captureBtn = document.getElementById('captureBtn');
-const sendBtn = document.getElementById('sendBtn');
-const downloadLink = document.getElementById('downloadLink');
+const saveBtn = document.getElementById('saveBtn');
 
 // 获取摄像头设备列表
 async function getCameras() {
@@ -52,7 +51,7 @@ async function startCamera() {
     startBtn.disabled = true;
     stopBtn.disabled = false;
     captureBtn.disabled = false;
-    sendBtn.disabled = true;
+    saveBtn.disabled = true;
 
     console.log('摄像头启动成功');
   } catch (error) {
@@ -72,7 +71,7 @@ function stopCamera() {
     startBtn.disabled = false;
     stopBtn.disabled = true;
     captureBtn.disabled = true;
-    sendBtn.disabled = true;
+    saveBtn.disabled = true;
 
     console.log('摄像头已停止');
   }
@@ -91,50 +90,33 @@ function captureSnapshot() {
   canvas.toBlob(blob => {
     lastBlob = blob;
     snapshot.src = URL.createObjectURL(blob);
-    sendBtn.disabled = false;
-
-    // 设置下载链接
-    downloadLink.href = snapshot.src;
-    downloadLink.style.display = 'inline';
-
+    saveBtn.disabled = false;
     console.log('截图完成');
   }, 'image/png');
 }
 
-// 上传截图
-async function sendSnapshot() {
+// 保存截图到本地
+function saveSnapshot() {
   if (!lastBlob) {
     alert('还没有截图');
     return;
   }
 
-  const form = new FormData();
-  form.append('file', lastBlob, 'capture.png');
-
   try {
-    sendBtn.disabled = true;
-    sendBtn.textContent = '上传中...';
+    // 创建下载链接
+    const url = URL.createObjectURL(lastBlob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `capture_${Date.now()}.png`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 
-    const resp = await fetch('/upload', {
-      method: 'POST',
-      body: form
-    });
-
-    const data = await resp.json().catch(() => ({}));
-
-    if (!resp.ok) {
-      const errMsg = data && data.error ? data.error : `HTTP ${resp.status}`;
-      alert('上传失败: ' + errMsg);
-      return;
-    }
-
-    alert('上传成功: ' + JSON.stringify(data));
+    alert('截图已保存到本地');
   } catch (err) {
     console.error(err);
-    alert('上传错误: ' + err.message);
-  } finally {
-    sendBtn.disabled = false;
-    sendBtn.textContent = '上传截图';
+    alert('保存错误: ' + err.message);
   }
 }
 
@@ -142,7 +124,7 @@ async function sendSnapshot() {
 startBtn.addEventListener('click', startCamera);
 stopBtn.addEventListener('click', stopCamera);
 captureBtn.addEventListener('click', captureSnapshot);
-sendBtn.addEventListener('click', sendSnapshot);
+saveBtn.addEventListener('click', saveSnapshot);
 
 // 页面加载时初始化
 window.addEventListener('load', async () => {
