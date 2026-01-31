@@ -3,192 +3,33 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>摄像头预览（占位）</title>
-  <style>
-    :root{
-      --bg:#f3f4f6;
-      --card:#fff;
-      --muted:#6b7280;
-      --accent:#3b82f6;
-    }
-    html,body{
-      height:100%;
-      margin:0;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue","Noto Sans",sans-serif;
-      background:var(--bg);
-      color:#111827;
-    }
-    .wrap{
-      min-height:100%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:24px;
-      box-sizing:border-box;
-    }
-    .card{
-      width:100%;
-      max-width:720px;
-      background:var(--card);
-      border-radius:12px;
-      box-shadow:0 6px 18px rgba(15,23,42,0.08);
-      padding:20px;
-      box-sizing:border-box;
-      text-align:center;
-    }
-    .preview{
-      position:relative;
-      width:100%;
-      padding-top:56.25%; /* 16:9 */
-      background:linear-gradient(180deg,#e6eefc,#f8fbff);
-      border-radius:8px;
-      overflow:hidden;
-      margin-bottom:14px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-    video{
-      position:absolute;
-      top:0; left:0; width:100%; height:100%;
-      object-fit:cover;
-      background:#000;
-    }
-    .placeholder{
-      position:absolute;
-      inset:0;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      flex-direction:column;
-      gap:8px;
-      color:var(--muted);
-      padding:12px;
-    }
-    .controls{
-      display:flex;
-      gap:8px;
-      justify-content:center;
-      margin-top:6px;
-    }
-    button{
-      border:0;
-      background:var(--accent);
-      color:white;
-      padding:8px 12px;
-      border-radius:8px;
-      cursor:pointer;
-      font-weight:600;
-    }
-    button.ghost{
-      background:transparent;
-      color:var(--accent);
-      border:1px solid rgba(59,130,246,0.12);
-    }
-    .note{
-      font-size:13px;
-      color:var(--muted);
-      margin-top:10px;
-    }
-    .error{
-      color:#b91c1c;
-      font-weight:600;
-    }
-  </style>
+  <title>摄像头预览 & 截图上传</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="wrap">
-    <div class="card" role="main">
-      <h2>摄像头预览（占位）</h2>
+  <h1>摄像头预览 & 截图上传</h1>
 
-      <div class="preview" id="preview">
-        <video id="video" playsinline autoplay muted></video>
+  <div class="controls">
+    <label for="videoSelect">选择摄像头：</label>
+    <select id="videoSelect"></select>
 
-        <div class="placeholder" id="placeholder">
-          <!-- 简单占位图标（SVG） -->
-          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-            <rect width="24" height="24" rx="4" fill="#e6eefc"/>
-            <path d="M4 7h3l2-2h6l2 2h3v10H4V7z" fill="#93c5fd"/>
-            <circle cx="12" cy="12" r="3.5" fill="#bfdbfe"/>
-          </svg>
-
-          <div id="placeholderText">等待摄像头启动或允许摄像头权限</div>
-        </div>
-      </div>
-
-      <div class="controls">
-        <button id="startBtn">启动摄像头</button>
-        <button id="stopBtn" class="ghost" disabled>停止摄像头</button>
-      </div>
-
-      <div class="note">
-        在 localhost 上打开该页面并允许摄像头访问。若浏览器阻止访问或没有摄像头，页面会显示占位提示。
-      </div>
-      <div id="message" class="note"></div>
-    </div>
+    <button id="startBtn">开始摄像头</button>
+    <button id="stopBtn" disabled>停止</button>
+    <button id="captureBtn" disabled>截图</button>
+    <button id="sendBtn" disabled>上传截图</button>
+    <a id="downloadLink" style="display:none" download="capture.png">下载截图</a>
   </div>
 
-  <script>
-    const startBtn = document.getElementById('startBtn');
-    const stopBtn = document.getElementById('stopBtn');
-    const videoEl = document.getElementById('video');
-    const placeholder = document.getElementById('placeholder');
-    const messageEl = document.getElementById('message');
+  <div class="preview">
+    <video id="video" autoplay playsinline></video>
+    <canvas id="canvas" style="display:none"></canvas>
+  </div>
 
-    let stream = null;
+  <div class="thumb">
+    <h3>截图预览</h3>
+    <img id="snapshot" alt="snapshot preview" />
+  </div>
 
-    function showMessage(text, isError=false){
-      messageEl.textContent = text || '';
-      messageEl.className = isError ? 'note error' : 'note';
-    }
-
-    async function startCamera(){
-      showMessage('');
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        showMessage('当前浏览器不支持摄像头访问。', true);
-        return;
-      }
-
-      try {
-        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
-        videoEl.srcObject = stream;
-        videoEl.onloadedmetadata = () => videoEl.play().catch(()=>{});
-        placeholder.style.display = 'none';
-        startBtn.disabled = true;
-        stopBtn.disabled = false;
-        showMessage('摄像头已启动。');
-      } catch (err) {
-        console.error(err);
-        // 常见错误信息处理
-        if (err.name === 'NotAllowedError') {
-          showMessage('已拒绝摄像头权限，请在浏览器地址栏允许或在设置中启用权限。', true);
-        } else if (err.name === 'NotFoundError') {
-          showMessage('未找到可用摄像头设备。', true);
-        } else {
-          showMessage('启动摄像头失败：' + (err.message || err.name), true);
-        }
-        placeholder.style.display = 'flex';
-      }
-    }
-
-    function stopCamera(){
-      if (stream) {
-        const tracks = stream.getTracks();
-        tracks.forEach(t => t.stop());
-        stream = null;
-      }
-      videoEl.srcObject = null;
-      placeholder.style.display = 'flex';
-      startBtn.disabled = false;
-      stopBtn.disabled = true;
-      showMessage('摄像头已停止。');
-    }
-
-    startBtn.addEventListener('click', startCamera);
-    stopBtn.addEventListener('click', stopCamera);
-
-    // 如果想要页面加载时自动请求摄像头（不推荐在首次加载就请求），可以取消下面的注释：
-    // startCamera();
-  </script>
+  <script src="app.js"></script>
 </body>
 </html>
