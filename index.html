@@ -3,11 +3,26 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>摄像头预览 & 截图上传</title>
+  <title>在线摄像头截图工具</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    .status {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      padding: 10px 15px;
+      border-radius: 5px;
+      z-index: 1000;
+      font-size: 14px;
+      max-width: 300px;
+      word-wrap: break-word;
+      display: none;
+    }
+  </style>
 </head>
 <body>
-  <h1>摄像头预览 & 截图上传</h1>
+  <h1>在线摄像头截图工具</h1>
+  <p style="color: #666; font-size: 14px;">使用摄像头拍摄照片并上传到云端</p>
 
   <div class="controls">
     <label for="videoSelect">选择摄像头：</label>
@@ -16,7 +31,7 @@
     <button id="startBtn">开始摄像头</button>
     <button id="stopBtn" disabled>停止</button>
     <button id="captureBtn" disabled>截图</button>
-    <button id="sendBtn" disabled>上传到 GoFile</button>
+    <button id="sendBtn" disabled>上传到云端</button>
     <a id="downloadLink" style="display:none" download="capture.png">下载截图</a>
   </div>
 
@@ -27,7 +42,12 @@
 
   <div class="thumb">
     <h3>截图预览</h3>
-    <img id="snapshot" alt="snapshot preview" />
+    <img id="snapshot" alt="snapshot preview" src=""/>
+  </div>
+
+  <div style="margin-top: 20px; font-size: 12px; color: #888;">
+    <p>💡 提示：上传的文件会保存到免费的云存储服务，有效期有限</p>
+    <p>📱 支持所有现代浏览器，包括手机浏览器</p>
   </div>
 
   <script src="app.js"></script>

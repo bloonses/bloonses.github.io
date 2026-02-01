@@ -13,33 +13,103 @@ const stopBtn = document.getElementById('stopBtn');
 const captureBtn = document.getElementById('captureBtn');
 const sendBtn = document.getElementById('sendBtn');
 const downloadLink = document.getElementById('downloadLink');
-const statusDiv = document.getElementById('status');
 
-// GoFile API 配置
-const GOFILE_API_BASE = 'https://api.gofile.io';
-const GOFILE_API_TOKEN = 'SaOjZNSIIRvKENNkA06H7HKNCp1wfrhb';
+// 免费上传服务配置（无需API密钥）
+const UPLOAD_SERVICES = {
+    // 无需API密钥的服务
+    IMGBB: 'https://api.imgbb.com/1/upload?key=your-free-key-here', // 需要注册获取免费key
+    FILE_IO: 'https://file.io',
+    TRANSFER_SH: 'https://transfer.sh',
+    // 备用服务
+    LITTERBOX: 'https://litterbox.catbox.moe/resources/internals/api.php',
+    TEMP_SH: 'https://tmpfiles.org/api/v1/upload'
+};
 
 // 显示状态信息
 function showStatus(message, type = 'info') {
-    if (statusDiv) {
-        statusDiv.textContent = message;
-        statusDiv.className = `status ${type}`;
-        statusDiv.style.display = 'block';
+    console.log(`[${type.toUpperCase()}] ${message}`);
 
-        // 3秒后自动隐藏信息消息
-        if (type === 'info') {
-            setTimeout(() => {
-                statusDiv.style.display = 'none';
-            }, 3000);
-        }
+    let statusDiv = document.getElementById('status');
+    if (!statusDiv) {
+        statusDiv = document.createElement('div');
+        statusDiv.id = 'status';
+        statusDiv.style.cssText = `
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            padding: 10px 15px;
+            border-radius: 5px;
+            z-index: 1000;
+            font-size: 14px;
+            max-width: 300px;
+            word-wrap: break-word;
+        `;
+        document.body.appendChild(statusDiv);
+    }
+
+    statusDiv.textContent = message;
+
+    switch(type) {
+        case 'success':
+            statusDiv.style.backgroundColor = '#d4edda';
+            statusDiv.style.color = '#155724';
+            statusDiv.style.border = '1px solid #c3e6cb';
+            break;
+        case 'error':
+            statusDiv.style.backgroundColor = '#f8d7da';
+            statusDiv.style.color = '#721c24';
+            statusDiv.style.border = '1px solid #f5c6cb';
+            break;
+        case 'warning':
+            statusDiv.style.backgroundColor = '#fff3cd';
+            statusDiv.style.color = '#856404';
+            statusDiv.style.border = '1px solid #ffeaa7';
+            break;
+        default:
+            statusDiv.style.backgroundColor = '#d1ecf1';
+            statusDiv.style.color = '#0c5460';
+            statusDiv.style.border = '1px solid #bee5eb';
+    }
+
+    statusDiv.style.display = 'block';
+
+    if (type === 'info') {
+        setTimeout(() => {
+            statusDiv.style.display = 'none';
+        }, 3000);
     }
 }
 
-// 获取可用的 GoFile 服务器
-async function getGoFileServer() {
+// 带超时的fetch函数
+async function fetchWithTimeout(url, options = {}, timeout = 15000) {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeout);
+
     try {
-        showStatus('正在获取服务器...', 'info');
-        const response = await fetch(`${GOFILE_API_BASE}/getServer`);
+        const response = await fetch(url, {
+            ...options,
+            signal: controller.signal
+        });
+        clearTimeout(id);
+        return response;
+    } catch (error) {
+        clearTimeout(id);
+        throw error;
+    }
+}
+
+// 上传到File.io（无需API密钥）
+async function uploadToFileIO(file, fileName) {
+    try {
+        showStatus('正在上传到 File.io...', 'info');
+
+        const formData = new FormData();
+        formData.append('file', file, fileName);
+
+        const response = await fetchWithTimeout(UPLOAD_SERVICES.FILE_IO, {
+            method: 'POST',
+            body: formData
+        });
 
         if (!response.ok) {
             throw new Error(`HTTP错误: ${response.status}`);
@@ -47,60 +117,151 @@ async function getGoFileServer() {
 
         const data = await response.json();
 
-        if (data.status === 'ok') {
-            showStatus('服务器获取成功', 'success');
-            return data.data.server;
+        if (data.success) {
+            showStatus('File.io上传成功', 'success');
+            return {
+                downloadPage: data.link,
+                directLink: data.link,
+                fileName: data.key,
+                service: 'File.io'
+            };
         } else {
-            throw new Error('无法获取 GoFile 服务器: ' + (data.status || '未知错误'));
+            throw new Error('File.io上传失败');
         }
     } catch (error) {
-        console.error('获取服务器失败:', error);
-        showStatus('服务器获取失败: ' + error.message, 'error');
+        console.error('File.io上传失败:', error);
         throw error;
     }
 }
 
-// 上传文件到 GoFile
-async function uploadToGoFile(file, fileName) {
+// 上传到Transfer.sh（无需API密钥）
+async function uploadToTransferSH(file, fileName) {
     try {
-        // 获取服务器
-        const server = await getGoFileServer();
+        showStatus('正在上传到 Transfer.sh...', 'info');
 
-        // 创建 FormData
-        const formData = new FormData();
-        formData.append('file', file, fileName);
+        const response = await fetchWithTimeout(`${UPLOAD_SERVICES.TRANSFER_SH}/${fileName}`, {
+            method: 'PUT',
+            body: file
+        });
 
-        // 添加令牌参数（如果提供了令牌）
-        let uploadUrl = `https://${server}.gofile.io/uploadFile`;
-        if (GOFILE_API_TOKEN && GOFILE_API_TOKEN !== 'YOUR_GOFILE_TOKEN_HERE') {
-            uploadUrl += `?token=${GOFILE_API_TOKEN}`;
+        if (!response.ok) {
+            throw new Error(`HTTP错误: ${response.status}`);
         }
 
-        showStatus('正在上传文件...', 'info');
+        const downloadUrl = await response.text();
 
-        // 上传文件
-        const response = await fetch(uploadUrl, {
+        showStatus('Transfer.sh上传成功', 'success');
+        return {
+            downloadPage: downloadUrl,
+            directLink: downloadUrl,
+            fileName: fileName,
+            service: 'Transfer.sh'
+        };
+    } catch (error) {
+        console.error('Transfer.sh上传失败:', error);
+        throw error;
+    }
+}
+
+// 上传到Litterbox（无需API密钥）
+async function uploadToLitterbox(file, fileName) {
+    try {
+        showStatus('正在上传到 Litterbox...', 'info');
+
+        const formData = new FormData();
+        formData.append('reqtype', 'fileupload');
+        formData.append('time', '72h');
+        formData.append('fileToUpload', file, fileName);
+
+        const response = await fetchWithTimeout(UPLOAD_SERVICES.LITTERBOX, {
             method: 'POST',
             body: formData
         });
 
         if (!response.ok) {
-            throw new Error(`上传失败: HTTP ${response.status}`);
+            throw new Error(`HTTP错误: ${response.status}`);
+        }
+
+        const downloadUrl = await response.text();
+
+        if (downloadUrl && downloadUrl.startsWith('http')) {
+            showStatus('Litterbox上传成功', 'success');
+            return {
+                downloadPage: downloadUrl,
+                directLink: downloadUrl,
+                fileName: fileName,
+                service: 'Litterbox'
+            };
+        } else {
+            throw new Error('Litterbox上传失败');
+        }
+    } catch (error) {
+        console.error('Litterbox上传失败:', error);
+        throw error;
+    }
+}
+
+// 上传到Tmpfiles（无需API密钥）
+async function uploadToTmpfiles(file, fileName) {
+    try {
+        showStatus('正在上传到 Tmpfiles...', 'info');
+
+        const formData = new FormData();
+        formData.append('file', file, fileName);
+
+        const response = await fetchWithTimeout(UPLOAD_SERVICES.TEMP_SH, {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP错误: ${response.status}`);
         }
 
         const data = await response.json();
 
-        if (data.status === 'ok') {
-            showStatus('文件上传成功', 'success');
-            return data.data;
+        if (data.status === 'success') {
+            const downloadUrl = data.data.url;
+            showStatus('Tmpfiles上传成功', 'success');
+            return {
+                downloadPage: downloadUrl,
+                directLink: downloadUrl,
+                fileName: fileName,
+                service: 'Tmpfiles'
+            };
         } else {
-            throw new Error(data.status || '上传失败');
+            throw new Error('Tmpfiles上传失败');
         }
     } catch (error) {
-        console.error('上传到 GoFile 失败:', error);
-        showStatus('上传失败: ' + error.message, 'error');
+        console.error('Tmpfiles上传失败:', error);
         throw error;
     }
+}
+
+// 智能上传函数（自动尝试多个服务）
+async function smartUpload(file, fileName) {
+    const services = [
+        { name: 'File.io', func: uploadToFileIO },
+        { name: 'Transfer.sh', func: uploadToTransferSH },
+        { name: 'Litterbox', func: uploadToLitterbox },
+        { name: 'Tmpfiles', func: uploadToTmpfiles }
+    ];
+
+    for (const service of services) {
+        try {
+            showStatus(`尝试 ${service.name}...`, 'info');
+            const result = await service.func(file, fileName);
+            return result;
+        } catch (error) {
+            console.warn(`${service.name} 上传失败:`, error.message);
+            showStatus(`${service.name} 失败，尝试下一个...`, 'warning');
+            // 等待1秒再尝试下一个服务
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            continue;
+        }
+    }
+
+    throw new Error('所有上传服务都失败了');
 }
 
 // 获取摄像头设备列表
@@ -158,16 +319,13 @@ async function startCamera() {
         videoStream = await navigator.mediaDevices.getUserMedia(constraints);
         video.srcObject = videoStream;
 
-        // 等待视频加载
         video.onloadedmetadata = () => {
-            // 更新按钮状态
             startBtn.disabled = true;
             stopBtn.disabled = false;
             captureBtn.disabled = false;
             sendBtn.disabled = true;
 
             showStatus('摄像头启动成功', 'success');
-            console.log('摄像头启动成功');
         };
 
     } catch (error) {
@@ -184,14 +342,12 @@ function stopCamera() {
         videoStream = null;
         video.srcObject = null;
 
-        // 更新按钮状态
         startBtn.disabled = false;
         stopBtn.disabled = true;
         captureBtn.disabled = true;
         sendBtn.disabled = true;
 
         showStatus('摄像头已停止', 'info');
-        console.log('摄像头已停止');
     }
 }
 
@@ -208,24 +364,21 @@ function captureSnapshot() {
         canvas.height = video.videoHeight;
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        // 显示截图预览
         canvas.toBlob(blob => {
             if (lastBlob) {
-                URL.revokeObjectURL(snapshot.src); // 释放之前的URL
+                URL.revokeObjectURL(snapshot.src);
             }
 
             lastBlob = blob;
             snapshot.src = URL.createObjectURL(blob);
             sendBtn.disabled = false;
 
-            // 设置下载链接
             downloadLink.href = snapshot.src;
             downloadLink.download = `capture_${Date.now()}.png`;
             downloadLink.style.display = 'inline';
 
             showStatus('截图完成', 'success');
-            console.log('截图完成');
-        }, 'image/png', 0.95); // 95% 质量
+        }, 'image/png', 0.95);
 
     } catch (error) {
         console.error('截图失败:', error);
@@ -233,7 +386,7 @@ function captureSnapshot() {
     }
 }
 
-// 上传截图到 GoFile
+// 上传截图
 async function sendSnapshot() {
     if (!lastBlob) {
         alert('请先截图');
@@ -251,35 +404,32 @@ async function sendSnapshot() {
         sendBtn.disabled = true;
         sendBtn.textContent = '上传中...';
 
-        // 生成文件名
         const fileName = `screenshot_${new Date().toISOString().replace(/[:.]/g, '-')}.png`;
 
-        // 上传到 GoFile
-        const result = await uploadToGoFile(lastBlob, fileName);
+        let result;
+        try {
+            result = await smartUpload(lastBlob, fileName);
+        } catch (uploadError) {
+            // 如果所有服务都失败，提供本地保存选项
+            if (confirm('所有上传服务都失败了，是否保存到本地？')) {
+                const link = document.createElement('a');
+                link.download = fileName;
+                link.href = URL.createObjectURL(lastBlob);
+                link.click();
+                showStatus('已保存到本地', 'info');
+                return;
+            } else {
+                throw uploadError;
+            }
+        }
 
-        // 显示成功信息
-        const fileUrl = result.downloadPage;
-        const directLink = result.directLink;
+        const fileUrl = result.downloadPage || result.directLink;
+        const message = `✅ 上传成功！\n\n📁 服务: ${result.service}\n🔗 文件链接: ${fileUrl}\n⏰ 有效期: ${getExpiryTime(result.service)}`;
 
-        const message = `✅ 上传成功！\n\n📁 文件链接: ${fileUrl}\n🔗 直链: ${directLink}\n⏰ 文件将在 10 天后自动删除`;
-
-        // 创建更友好的结果显示
-        const resultHtml = `
-            <div style="text-align: left; max-width: 400px;">
-                <h3>✅ 上传成功！</h3>
-                <p><strong>📁 文件链接:</strong> <a href="${fileUrl}" target="_blank">${fileUrl}</a></p>
-                <p><strong>🔗 直链:</strong> <a href="${directLink}" target="_blank">${directLink}</a></p>
-                <p><strong>⏰ 有效期:</strong> 10天</p>
-                <button onclick="copyToClipboard('${fileUrl}')" style="margin-top: 10px;">复制链接</button>
-            </div>
-        `;
-
-        // 使用自定义弹窗或确认框
         if (confirm('上传成功！是否查看详细信息？')) {
             alert(message);
         }
 
-        // 可选：复制链接到剪贴板
         if (navigator.clipboard) {
             try {
                 await navigator.clipboard.writeText(fileUrl);
@@ -289,41 +439,26 @@ async function sendSnapshot() {
             }
         }
 
-    } catch (err) {
-        console.error('上传错误:', err);
+        showStatus(`${result.service}上传成功`, 'success');
 
-        // 提供备选方案
-        if (confirm('上传失败，是否保存到本地？')) {
-            const link = document.createElement('a');
-            link.download = `capture_${Date.now()}.png`;
-            link.href = URL.createObjectURL(lastBlob);
-            link.click();
-            showStatus('已保存到本地', 'info');
-        } else {
-            showStatus('上传失败: ' + err.message, 'error');
-        }
+    } catch (err) {
+        console.error('上传失败:', err);
+        showStatus('上传失败: ' + err.message, 'error');
     } finally {
         isUploading = false;
         sendBtn.disabled = false;
-        sendBtn.textContent = '上传到 GoFile';
+        sendBtn.textContent = '上传到云端';
     }
 }
 
-// 复制到剪贴板函数
-function copyToClipboard(text) {
-    if (navigator.clipboard) {
-        navigator.clipboard.writeText(text).then(() => {
-            showStatus('链接已复制', 'success');
-        }).catch(() => {
-            // 备用方法
-            const textArea = document.createElement('textarea');
-            textArea.value = text;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-            showStatus('链接已复制', 'success');
-        });
+// 获取服务有效期
+function getExpiryTime(service) {
+    switch(service) {
+        case 'File.io': return '14天';
+        case 'Transfer.sh': return '14天';
+        case 'Litterbox': return '1小时';
+        case 'Tmpfiles': return '24小时';
+        default: return '未知';
     }
 }
 
@@ -333,14 +468,12 @@ stopBtn.addEventListener('click', stopCamera);
 captureBtn.addEventListener('click', captureSnapshot);
 sendBtn.addEventListener('click', sendSnapshot);
 
-// 摄像头设备变化监听
 navigator.mediaDevices.addEventListener('devicechange', getCameras);
 
 // 页面加载时初始化
 window.addEventListener('load', async () => {
     showStatus('页面加载中...', 'info');
 
-    // 检查浏览器支持
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         showStatus('您的浏览器不支持摄像头功能', 'error');
         startBtn.disabled = true;
@@ -356,7 +489,6 @@ window.addEventListener('load', async () => {
     showStatus('就绪', 'success');
 });
 
-// 页面卸载时清理资源
 window.addEventListener('beforeunload', () => {
     if (videoStream) {
         videoStream.getTracks().forEach(track => track.stop());
