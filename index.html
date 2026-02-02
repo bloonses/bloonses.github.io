@@ -3,51 +3,153 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>在线摄像头截图工具</title>
+  <title>📷 在线摄像头截图工具</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     .status {
       position: fixed;
-      top: 10px;
-      right: 10px;
-      padding: 10px 15px;
-      border-radius: 5px;
+      top: 20px;
+      right: 20px;
+      padding: 12px 16px;
+      border-radius: 8px;
       z-index: 1000;
       font-size: 14px;
-      max-width: 300px;
+      max-width: 320px;
       word-wrap: break-word;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      backdrop-filter: blur(10px);
       display: none;
+      animation: slideInRight 0.3s ease-out;
+    }
+
+    @keyframes slideInRight {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>在线摄像头截图工具</h1>
-  <p style="color: #666; font-size: 14px;">使用摄像头拍摄照片并上传到云端</p>
+  <div class="container">
+    <!-- 头部区域 -->
+    <header class="header">
+      <div class="header-content">
+        <h1 class="title">
+          <span class="icon">📷</span>
+          在线摄像头截图工具
+        </h1>
+        <p class="subtitle">使用摄像头拍摄照片并上传到云端</p>
+      </div>
+    </header>
 
-  <div class="controls">
-    <label for="videoSelect">选择摄像头：</label>
-    <select id="videoSelect"></select>
+    <!-- 主要内容区域 -->
+    <main class="main-content">
+      <!-- 控制面板 -->
+      <section class="control-panel">
+        <div class="panel-header">
+          <h2>📋 控制面板</h2>
+        </div>
+        <div class="controls-grid">
+          <div class="control-group">
+            <label for="videoSelect" class="control-label">🎥 选择摄像头</label>
+            <select id="videoSelect" class="select-input"></select>
+          </div>
+          
+          <div class="button-group">
+            <button id="startBtn" class="btn btn-primary">
+              <span class="btn-icon">▶️</span>
+              启动摄像头
+            </button>
+            <button id="stopBtn" disabled class="btn btn-secondary">
+              <span class="btn-icon">⏹️</span>
+              停止
+            </button>
+            <button id="captureBtn" disabled class="btn btn-success">
+              <span class="btn-icon">📸</span>
+              截图
+            </button>
+            <button id="sendBtn" disabled class="btn btn-warning">
+              <span class="btn-icon">☁️</span>
+              上传到云端
+            </button>
+          </div>
+        </div>
+      </section>
 
-    <button id="startBtn">开始摄像头</button>
-    <button id="stopBtn" disabled>停止</button>
-    <button id="captureBtn" disabled>截图</button>
-    <button id="sendBtn" disabled>上传到云端</button>
-    <a id="downloadLink" style="display:none" download="capture.png">下载截图</a>
-  </div>
+      <!-- 摄像头预览区域 -->
+      <section class="preview-section">
+        <div class="preview-header">
+          <h2>👁️ 实时预览</h2>
+        </div>
+        <div class="preview-container">
+          <div class="video-wrapper">
+            <video id="video" autoplay playsinline></video>
+            <div class="video-overlay">
+              <span class="overlay-text">摄像头未启动</span>
+            </div>
+          </div>
+          <canvas id="canvas" style="display:none"></canvas>
+        </div>
+      </section>
 
-  <div class="preview">
-    <video id="video" autoplay playsinline></video>
-    <canvas id="canvas" style="display:none"></canvas>
-  </div>
+      <!-- 截图预览区域 -->
+      <section class="snapshot-section">
+        <div class="snapshot-header">
+          <h2>🖼️ 截图预览</h2>
+          <a id="downloadLink" style="display:none" download="capture.png" class="download-btn">
+            <span class="btn-icon">💾</span>
+            下载截图
+          </a>
+        </div>
+        <div class="snapshot-container">
+          <img id="snapshot" alt="snapshot preview" src="" class="snapshot-image"/>
+          <div class="snapshot-placeholder">
+            <span class="placeholder-icon">📸</span>
+            <p>截图将显示在这里</p>
+          </div>
+        </div>
+      </section>
 
-  <div class="thumb">
-    <h3>截图预览</h3>
-    <img id="snapshot" alt="snapshot preview" src=""/>
-  </div>
+      <!-- 提示信息区域 -->
+      <section class="info-section">
+        <div class="info-grid">
+          <div class="info-card">
+            <div class="info-icon">💡</div>
+            <div class="info-content">
+              <h3>使用提示</h3>
+              <p>上传的文件会保存到免费的云存储服务，有效期有限</p>
+            </div>
+          </div>
+          <div class="info-card">
+            <div class="info-icon">📱</div>
+            <div class="info-content">
+              <h3>兼容性</h3>
+              <p>支持所有现代浏览器，包括手机浏览器</p>
+            </div>
+          </div>
+          <div class="info-card">
+            <div class="info-icon">⚡</div>
+            <div class="info-content">
+              <h3>快速操作</h3>
+              <p>点击截图后可直接上传或下载</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
 
-  <div style="margin-top: 20px; font-size: 12px; color: #888;">
-    <p>💡 提示：上传的文件会保存到免费的云存储服务，有效期有限</p>
-    <p>📱 支持所有现代浏览器，包括手机浏览器</p>
+    <!-- 页脚 -->
+    <footer class="footer">
+      <p>© 2024 在线摄像头截图工具 | 基于 Web 技术构建</p>
+    </footer>
   </div>
 
   <script src="app.js"></script>
