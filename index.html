@@ -62,7 +62,7 @@
             <label for="videoSelect" class="control-label">🎥 选择摄像头</label>
             <select id="videoSelect" class="select-input"></select>
           </div>
-          
+
           <div class="button-group">
             <button id="startBtn" class="btn btn-primary">
               <span class="btn-icon">▶️</span>
@@ -85,20 +85,20 @@
       </section>
 
       <!-- 摄像头预览区域 -->
-      <section class="preview-section">
-        <div class="preview-header">
-          <h2>👁️ 实时预览</h2>
-        </div>
-        <div class="preview-container">
-          <div class="video-wrapper" id="videoWrapper">
-            <video id="video" autoplay playsinline></video>
-            <div class="video-overlay" id="videoOverlay">
-              <span class="overlay-text">摄像头未启动</span>
-            </div>
-          </div>
-          <canvas id="canvas" style="display:none"></canvas>
-        </div>
-      </section>
+<section class="preview-section">
+  <div class="preview-header">
+    <h2>👁️ 实时预览</h2>
+  </div>
+  <div class="preview-container">
+    <div class="video-wrapper" id="videoWrapper">
+      <video id="video" autoplay playsinline></video>
+      <div class="video-overlay" id="videoOverlay">
+        <span class="overlay-text">摄像头未启动</span>
+      </div>
+    </div>
+    <canvas id="canvas" style="display:none"></canvas>
+  </div>
+</section>
 
       <!-- 截图预览区域 -->
       <section class="snapshot-section">

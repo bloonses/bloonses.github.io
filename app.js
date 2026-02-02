@@ -13,14 +13,18 @@ const stopBtn = document.getElementById('stopBtn');
 const captureBtn = document.getElementById('captureBtn');
 const sendBtn = document.getElementById('sendBtn');
 const downloadLink = document.getElementById('downloadLink');
+const videoWrapper = document.getElementById('videoWrapper'); // 添加视频包装器引用
 
 // 免费上传服务配置（无需API密钥）
 const UPLOAD_SERVICES = {
+    // 无需API密钥的服务
+    IMGBB: 'https://api.imgbb.com/1/upload?key=your-free-key-here', // 需要注册获取免费key
+    FILE_IO: 'https://file.io',
+    TRANSFER_SH: 'https://transfer.sh',
     // 备用服务
     LITTERBOX: 'https://litterbox.catbox.moe/resources/internals/api.php',
     TEMP_SH: 'https://tmpfiles.org/api/v1/upload'
 };
-
 // 显示状态信息
 function showStatus(message, type = 'info') {
     console.log(`[${type.toUpperCase()}] ${message}`);
@@ -90,6 +94,71 @@ async function fetchWithTimeout(url, options = {}, timeout = 15000) {
         return response;
     } catch (error) {
         clearTimeout(id);
+        throw error;
+    }
+}
+
+// 上传到File.io（无需API密钥）
+async function uploadToFileIO(file, fileName) {
+    try {
+        showStatus('正在上传到 File.io...', 'info');
+
+        const formData = new FormData();
+        formData.append('file', file, fileName);
+
+        const response = await fetchWithTimeout(UPLOAD_SERVICES.FILE_IO, {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP错误: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (data.success) {
+            showStatus('File.io上传成功', 'success');
+            return {
+                downloadPage: data.link,
+                directLink: data.link,
+                fileName: data.key,
+                service: 'File.io'
+            };
+        } else {
+            throw new Error('File.io上传失败');
+        }
+    } catch (error) {
+        console.error('File.io上传失败:', error);
+        throw error;
+    }
+}
+
+// 上传到Transfer.sh（无需API密钥）
+async function uploadToTransferSH(file, fileName) {
+    try {
+        showStatus('正在上传到 Transfer.sh...', 'info');
+
+        const response = await fetchWithTimeout(`${UPLOAD_SERVICES.TRANSFER_SH}/${fileName}`, {
+            method: 'PUT',
+            body: file
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP错误: ${response.status}`);
+        }
+
+        const downloadUrl = await response.text();
+
+        showStatus('Transfer.sh上传成功', 'success');
+        return {
+            downloadPage: downloadUrl,
+            directLink: downloadUrl,
+            fileName: fileName,
+            service: 'Transfer.sh'
+        };
+    } catch (error) {
+        console.error('Transfer.sh上传失败:', error);
         throw error;
     }
 }
@@ -172,6 +241,8 @@ async function uploadToTmpfiles(file, fileName) {
 // 智能上传函数（自动尝试多个服务）
 async function smartUpload(file, fileName) {
     const services = [
+        { name: 'File.io', func: uploadToFileIO },
+        { name: 'Transfer.sh', func: uploadToTransferSH },
         { name: 'Litterbox', func: uploadToLitterbox },
         { name: 'Tmpfiles', func: uploadToTmpfiles }
     ];
@@ -254,6 +325,9 @@ async function startCamera() {
             captureBtn.disabled = false;
             sendBtn.disabled = true;
 
+            // 添加摄像头激活状态
+            videoWrapper.classList.add('camera-active');
+
             showStatus('摄像头启动成功', 'success');
         };
 
@@ -276,9 +350,13 @@ function stopCamera() {
         captureBtn.disabled = true;
         sendBtn.disabled = true;
 
+        // 移除摄像头激活状态
+        videoWrapper.classList.remove('camera-active');
+
         showStatus('摄像头已停止', 'info');
     }
 }
+
 
 // 截图
 function captureSnapshot() {
@@ -383,6 +461,8 @@ async function sendSnapshot() {
 // 获取服务有效期
 function getExpiryTime(service) {
     switch(service) {
+        case 'File.io': return '14天';
+        case 'Transfer.sh': return '14天';
         case 'Litterbox': return '1小时';
         case 'Tmpfiles': return '24小时';
         default: return '未知';

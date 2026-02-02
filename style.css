@@ -239,6 +239,7 @@ video {
 /* 修复：摄像头未启动时显示覆盖层，启动后隐藏 */
 .video-wrapper:not(.camera-active) .video-overlay {
   opacity: 1;
+  pointer-events: none;
 }
 
 .video-wrapper.camera-active .video-overlay {
@@ -344,26 +345,26 @@ video {
   .container {
     padding: 0 15px;
   }
-  
+
   .title {
     font-size: 2rem;
   }
-  
+
   .button-group {
     flex-direction: column;
   }
-  
+
   .btn {
     width: 100%;
     justify-content: center;
   }
-  
+
   .preview-header, .snapshot-header {
     flex-direction: column;
     gap: 1rem;
     align-items: flex-start;
   }
-  
+
   .info-grid {
     grid-template-columns: 1fr;
   }
@@ -373,7 +374,7 @@ video {
   .title {
     font-size: 1.5rem;
   }
-  
+
   .control-panel, .preview-section, .snapshot-section, .info-section {
     padding: 1rem;
   }
