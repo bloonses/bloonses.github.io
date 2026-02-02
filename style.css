@@ -233,12 +233,17 @@ video {
   background: rgba(0, 0, 0, 0.7);
   color: white;
   font-size: 1.2rem;
-  opacity: 0;
   transition: opacity 0.3s ease;
 }
 
-.video-wrapper:not(.active) .video-overlay {
+/* 修复：摄像头未启动时显示覆盖层，启动后隐藏 */
+.video-wrapper:not(.camera-active) .video-overlay {
   opacity: 1;
+}
+
+.video-wrapper.camera-active .video-overlay {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .snapshot-container {
