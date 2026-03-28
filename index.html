@@ -1,157 +1,496 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>📷 在线摄像头截图工具</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    .status {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      padding: 12px 16px;
-      border-radius: 8px;
-      z-index: 1000;
-      font-size: 14px;
-      max-width: 320px;
-      word-wrap: break-word;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      backdrop-filter: blur(10px);
-      display: none;
-      animation: slideInRight 0.3s ease-out;
-    }
-
-    @keyframes slideInRight {
-      from {
-        transform: translateX(100%);
-        opacity: 0;
-      }
-      to {
-        transform: translateX(0);
-        opacity: 1;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>情侣互动点单</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#ff6b6b',
+                        secondary: '#4ecdc4',
+                        accent: '#45b7d1',
+                        light: '#f7f7f7',
+                        dark: '#292f36'
+                    },
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            .bg-gradient {
+                background: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 100%);
+            }
+            .card-hover {
+                transition: all 0.3s ease;
+            }
+            .card-hover:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            }
+            .item-card {
+                transition: all 0.2s ease;
+            }
+            .item-card:hover {
+                border-color: #ff6b6b;
+            }
+            .item-card.selected {
+                border-color: #ff6b6b;
+                background-color: rgba(255, 107, 107, 0.1);
+            }
+        }
+    </style>
 </head>
-<body>
-  <div class="container">
-    <!-- 头部区域 -->
-    <header class="header">
-      <div class="header-content">
-        <h1 class="title">
-          <span class="icon">📷</span>
-          在线摄像头截图工具
-        </h1>
-        <p class="subtitle">使用摄像头拍摄照片并上传到云端</p>
-      </div>
-    </header>
+<body class="bg-light min-h-screen font-sans">
+    <div id="app" class="min-h-screen flex flex-col">
+        <!-- 导航栏 -->
+        <nav class="bg-white shadow-md">
+            <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <i class="fa fa-heart text-primary text-2xl"></i>
+                    <h1 class="text-xl font-bold text-dark">情侣互动点单</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="cart-btn" class="relative p-2 rounded-full hover:bg-gray-100">
+                        <i class="fa fa-shopping-cart text-dark"></i>
+                        <span id="cart-count" class="absolute -top-1 -right-1 bg-primary text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">0</span>
+                    </button>
+                </div>
+            </div>
+        </nav>
 
-    <!-- 主要内容区域 -->
-    <main class="main-content">
-      <!-- 控制面板 -->
-      <section class="control-panel">
-        <div class="panel-header">
-          <h2>📋 控制面板</h2>
+        <!-- 主内容区 -->
+        <main class="flex-1 container mx-auto px-4 py-6">
+            <!-- 欢迎语 -->
+            <div class="text-center mb-8">
+                <h2 class="text-2xl font-bold text-dark mb-2">亲爱的，今天想怎么互动呢？</h2>
+                <p class="text-gray-600" id="welcome-message">选择下方的互动选项，生成专属订单吧！</p>
+            </div>
+
+            <!-- 互动选项分类 -->
+            <div class="mb-8">
+                <h3 class="text-lg font-semibold text-dark mb-4">互动选项</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- 互动选项卡片 -->
+                    <div class="item-card border rounded-lg p-4 bg-white shadow-sm" data-item="hug" data-price="1">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-secondary bg-opacity-20 rounded-full flex items-center justify-center mr-4">
+                                <i class="fa fa-hug text-secondary text-xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-medium text-dark">抱抱</h4>
+                                <p class="text-sm text-gray-500">温暖的拥抱</p>
+                            </div>
+                            <div class="text-primary font-semibold">
+                                <i class="fa fa-heart"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="item-card border rounded-lg p-4 bg-white shadow-sm" data-item="kiss" data-price="2">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-primary bg-opacity-20 rounded-full flex items-center justify-center mr-4">
+                                <i class="fa fa-kiss-wink-heart text-primary text-xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-medium text-dark">亲亲</h4>
+                                <p class="text-sm text-gray-500">甜蜜的吻</p>
+                            </div>
+                            <div class="text-primary font-semibold">
+                                <i class="fa fa-heart"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="item-card border rounded-lg p-4 bg-white shadow-sm" data-item="hold-hand" data-price="1">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-accent bg-opacity-20 rounded-full flex items-center justify-center mr-4">
+                                <i class="fa fa-hand-holding-hand text-accent text-xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-medium text-dark">牵手</h4>
+                                <p class="text-sm text-gray-500">十指相扣</p>
+                            </div>
+                            <div class="text-primary font-semibold">
+                                <i class="fa fa-heart"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="item-card border rounded-lg p-4 bg-white shadow-sm" data-item="cuddle" data-price="3">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-purple-500 bg-opacity-20 rounded-full flex items-center justify-center mr-4">
+                                <i class="fa fa-bed text-purple-500 text-xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-medium text-dark">依偎</h4>
+                                <p class="text-sm text-gray-500">亲密依偎</p>
+                            </div>
+                            <div class="text-primary font-semibold">
+                                <i class="fa fa-heart"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="item-card border rounded-lg p-4 bg-white shadow-sm" data-item="compliment" data-price="1">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-yellow-500 bg-opacity-20 rounded-full flex items-center justify-center mr-4">
+                                <i class="fa fa-star text-yellow-500 text-xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-medium text-dark">赞美</h4>
+                                <p class="text-sm text-gray-500">真诚的赞美</p>
+                            </div>
+                            <div class="text-primary font-semibold">
+                                <i class="fa fa-heart"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="item-card border rounded-lg p-4 bg-white shadow-sm" data-item="surprise" data-price="4">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-green-500 bg-opacity-20 rounded-full flex items-center justify-center mr-4">
+                                <i class="fa fa-gift text-green-500 text-xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-medium text-dark">惊喜</h4>
+                                <p class="text-sm text-gray-500">小惊喜</p>
+                            </div>
+                            <div class="text-primary font-semibold">
+                                <i class="fa fa-heart"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 订单详情 -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <h3 class="text-lg font-semibold text-dark mb-4">订单详情</h3>
+                <div id="order-items" class="space-y-3 mb-6">
+                    <p class="text-gray-500 text-center py-4">还没有选择任何互动选项</p>
+                </div>
+                <div class="border-t pt-4 flex justify-between items-center">
+                    <span class="font-medium text-dark">总心动值：</span>
+                    <span id="total-price" class="text-xl font-bold text-primary">0</span>
+                </div>
+                <button id="generate-order" class="w-full mt-6 py-3 bg-gradient text-white rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                    生成互动订单
+                </button>
+            </div>
+        </main>
+
+        <!-- 结果模态框 -->
+        <div id="result-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white rounded-xl shadow-lg p-6 max-w-md w-full mx-4">
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 bg-primary bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fa fa-heart text-primary text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-dark">订单生成成功！</h3>
+                </div>
+                <div id="result-content" class="mb-6">
+                    <!-- 结果内容将在这里显示 -->
+                </div>
+                <div class="mb-6">
+                    <h4 class="font-medium text-dark mb-2">分享给TA</h4>
+                    <div class="flex">
+                        <input id="share-link" type="text" value="" readOnly class="flex-1 p-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-primary" />
+                        <button id="copy-link" class="bg-secondary text-white px-4 py-2 rounded-r-lg hover:bg-opacity-90">
+                            复制
+                        </button>
+                    </div>
+                </div>
+                <div class="flex space-x-3">
+                    <button id="close-modal" class="flex-1 py-2 border border-gray-300 rounded-lg text-dark hover:bg-gray-50">
+                        关闭
+                    </button>
+                    <button id="new-order" class="flex-1 py-2 bg-primary text-white rounded-lg hover:bg-opacity-90">
+                        新订单
+                    </button>
+                </div>
+            </div>
         </div>
-        <div class="controls-grid">
-          <div class="control-group">
-            <label for="videoSelect" class="control-label">🎥 选择摄像头</label>
-            <select id="videoSelect" class="select-input"></select>
-          </div>
 
-          <div class="button-group">
-            <button id="startBtn" class="btn btn-primary">
-              <span class="btn-icon">▶️</span>
-              启动摄像头
-            </button>
-            <button id="stopBtn" disabled class="btn btn-secondary">
-              <span class="btn-icon">⏹️</span>
-              停止
-            </button>
-            <button id="captureBtn" disabled class="btn btn-success">
-              <span class="btn-icon">📸</span>
-              截图
-            </button>
-            <button id="sendBtn" disabled class="btn btn-warning">
-              <span class="btn-icon">☁️</span>
-              上传到云端
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <!-- 摄像头预览区域 -->
-<section class="preview-section">
-  <div class="preview-header">
-    <h2>👁️ 实时预览</h2>
-  </div>
-  <div class="preview-container">
-    <div class="video-wrapper" id="videoWrapper">
-      <video id="video" autoplay playsinline></video>
-      <div class="video-overlay" id="videoOverlay">
-        <span class="overlay-text">摄像头未启动</span>
-      </div>
+        <!-- 页脚 -->
+        <footer class="bg-white shadow-inner py-4">
+            <div class="container mx-auto px-4 text-center text-gray-500 text-sm">
+                <p>© 2026 情侣互动点单 | 让爱情更加甜蜜</p>
+            </div>
+        </footer>
     </div>
-    <canvas id="canvas" style="display:none"></canvas>
-  </div>
-</section>
 
-      <!-- 截图预览区域 -->
-      <section class="snapshot-section">
-        <div class="snapshot-header">
-          <h2>🖼️ 截图预览</h2>
-          <a id="downloadLink" style="display:none" download="capture.png" class="download-btn">
-            <span class="btn-icon">💾</span>
-            下载截图
-          </a>
-        </div>
-        <div class="snapshot-container">
-          <img id="snapshot" alt="snapshot preview" src="" class="snapshot-image"/>
-          <div class="snapshot-placeholder">
-            <span class="placeholder-icon">📸</span>
-            <p>截图将显示在这里</p>
-          </div>
-        </div>
-      </section>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 状态管理
+            let selectedItems = [];
+            let totalPrice = 0;
 
-      <!-- 提示信息区域 -->
-      <section class="info-section">
-        <div class="info-grid">
-          <div class="info-card">
-            <div class="info-icon">💡</div>
-            <div class="info-content">
-              <h3>使用提示</h3>
-              <p>上传的文件会保存到免费的云存储服务，有效期有限</p>
-            </div>
-          </div>
-          <div class="info-card">
-            <div class="info-icon">📱</div>
-            <div class="info-content">
-              <h3>兼容性</h3>
-              <p>支持所有现代浏览器，包括手机浏览器</p>
-            </div>
-          </div>
-          <div class="info-card">
-            <div class="info-icon">⚡</div>
-            <div class="info-content">
-              <h3>快速操作</h3>
-              <p>点击截图后可直接上传或下载</p>
-            </div>
-          </div>
-        </div>
-      </section>
-    </main>
+            // DOM元素
+            const itemCards = document.querySelectorAll('.item-card');
+            const orderItems = document.getElementById('order-items');
+            const totalPriceEl = document.getElementById('total-price');
+            const cartCountEl = document.getElementById('cart-count');
+            const generateOrderBtn = document.getElementById('generate-order');
+            const resultModal = document.getElementById('result-modal');
+            const resultContent = document.getElementById('result-content');
+            const shareLinkEl = document.getElementById('share-link');
+            const copyLinkBtn = document.getElementById('copy-link');
+            const closeModalBtn = document.getElementById('close-modal');
+            const newOrderBtn = document.getElementById('new-order');
+            const welcomeMessage = document.getElementById('welcome-message');
 
-    <!-- 页脚 -->
-    <footer class="footer">
-      <p>© 2024 在线摄像头截图工具 | 基于 Web 技术构建</p>
-    </footer>
-  </div>
+            // 加载随机欢迎语
+            function loadWelcomeMessage() {
+                // 使用随机名言API
+                fetch('https://api.quotable.io/random?tags=love')
+                    .then(response => response.json())
+                    .then(data => {
+                        welcomeMessage.textContent = data.content;
+                    })
+                    .catch(error => {
+                        console.error('Error loading quote:', error);
+                    });
+            }
 
-  <script src="app.js"></script>
+            // 加载天气信息
+            function loadWeather() {
+                // 使用OpenWeatherMap API (需要替换为实际API密钥)
+                const apiKey = 'YOUR_API_KEY';
+                const city = 'Beijing';
+                const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric&lang=zh_cn`;
+                
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.weather) {
+                            const weather = data.weather[0].description;
+                            const temp = data.main.temp;
+                            // 可以在页面上显示天气信息
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading weather:', error);
+                    });
+            }
+
+            // 切换选中状态
+            itemCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const item = this.dataset.item;
+                    const price = parseInt(this.dataset.price);
+                    const itemName = this.querySelector('h4').textContent;
+
+                    const existingItem = selectedItems.find(i => i.item === item);
+                    
+                    if (existingItem) {
+                        // 取消选择
+                        selectedItems = selectedItems.filter(i => i.item !== item);
+                        totalPrice -= price;
+                        this.classList.remove('selected');
+                    } else {
+                        // 选择
+                        selectedItems.push({ item, price, name: itemName });
+                        totalPrice += price;
+                        this.classList.add('selected');
+                    }
+
+                    updateOrder();
+                });
+            });
+
+            // 更新订单
+            function updateOrder() {
+                if (selectedItems.length === 0) {
+                    orderItems.innerHTML = '<p class="text-gray-500 text-center py-4">还没有选择任何互动选项</p>';
+                    generateOrderBtn.disabled = true;
+                } else {
+                    orderItems.innerHTML = selectedItems.map(item => `
+                        <div class="flex justify-between items-center py-2 border-b">
+                            <span class="text-dark">${item.name}</span>
+                            <span class="text-primary">${item.price} <i class="fa fa-heart"></i></span>
+                        </div>
+                    `).join('');
+                    generateOrderBtn.disabled = false;
+                }
+
+                totalPriceEl.textContent = totalPrice;
+                cartCountEl.textContent = selectedItems.length;
+            }
+
+            // 生成订单
+            generateOrderBtn.addEventListener('click', function() {
+                if (selectedItems.length === 0) return;
+
+                // 生成订单内容
+                const orderContent = selectedItems.map(item => `
+                    <div class="flex items-center mb-3">
+                        <div class="w-8 h-8 bg-primary bg-opacity-20 rounded-full flex items-center justify-center mr-3">
+                            <i class="fa fa-heart text-primary"></i>
+                        </div>
+                        <span>${item.name}</span>
+                    </div>
+                `).join('');
+
+                // 生成随机爱情名言
+                fetch('https://api.quotable.io/random?tags=love')
+                    .then(response => response.json())
+                    .then(data => {
+                        resultContent.innerHTML = `
+                            <div class="mb-4">
+                                <h4 class="font-medium text-dark mb-2">互动清单：</h4>
+                                ${orderContent}
+                            </div>
+                            <div class="bg-light p-4 rounded-lg">
+                                <p class="text-gray-700 italic">"${data.content}"</p>
+                                <p class="text-right text-sm text-gray-500 mt-2">— ${data.author}</p>
+                            </div>
+                            <div class="mt-4 text-center">
+                                <span class="text-xl font-bold text-primary">总心动值：${totalPrice}</span>
+                            </div>
+                        `;
+
+                        // 生成分享链接
+                        const orderData = {
+                            items: selectedItems,
+                            total: totalPrice,
+                            quote: data.content,
+                            author: data.author
+                        };
+                        const encodedData = btoa(unescape(encodeURIComponent(JSON.stringify(orderData))));
+                        // 生成完整的分享链接，确保在部署后能在其他电脑上访问
+                        const shareLink = `${window.location.protocol}//${window.location.host}${window.location.pathname}?order=${encodedData}`;
+                        shareLinkEl.value = shareLink;
+
+                        // 显示模态框
+                        resultModal.classList.remove('hidden');
+                    })
+                    .catch(error => {
+                        console.error('Error generating order:', error);
+                        resultContent.innerHTML = `
+                            <div class="mb-4">
+                                <h4 class="font-medium text-dark mb-2">互动清单：</h4>
+                                ${orderContent}
+                            </div>
+                            <div class="mt-4 text-center">
+                                <span class="text-xl font-bold text-primary">总心动值：${totalPrice}</span>
+                            </div>
+                        `;
+
+                        // 生成分享链接
+                        const orderData = {
+                            items: selectedItems,
+                            total: totalPrice
+                        };
+                        const encodedData = btoa(unescape(encodeURIComponent(JSON.stringify(orderData))));
+                        // 生成完整的分享链接，确保在部署后能在其他电脑上访问
+                        const shareLink = `${window.location.protocol}//${window.location.host}${window.location.pathname}?order=${encodedData}`;
+                        shareLinkEl.value = shareLink;
+
+                        // 显示模态框
+                        resultModal.classList.remove('hidden');
+                    });
+            });
+
+            // 复制链接
+            copyLinkBtn.addEventListener('click', function() {
+                shareLinkEl.select();
+                document.execCommand('copy');
+                copyLinkBtn.textContent = '已复制';
+                setTimeout(() => {
+                    copyLinkBtn.textContent = '复制';
+                }, 2000);
+            });
+
+            // 关闭模态框
+            closeModalBtn.addEventListener('click', function() {
+                resultModal.classList.add('hidden');
+            });
+
+            // 新订单
+            newOrderBtn.addEventListener('click', function() {
+                resultModal.classList.add('hidden');
+                // 重置订单
+                selectedItems = [];
+                totalPrice = 0;
+                itemCards.forEach(card => card.classList.remove('selected'));
+                updateOrder();
+            });
+
+            // 检查URL参数，加载分享的订单
+            function checkShareLink() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const orderParam = urlParams.get('order');
+                
+                if (orderParam) {
+                    try {
+                        const decodedData = decodeURIComponent(escape(atob(orderParam)));
+                        const orderData = JSON.parse(decodedData);
+                        
+                        // 填充订单数据
+                        selectedItems = orderData.items || [];
+                        totalPrice = orderData.total || 0;
+                        
+                        // 更新选中状态
+                        itemCards.forEach(card => {
+                            const item = card.dataset.item;
+                            if (selectedItems.some(i => i.item === item)) {
+                                card.classList.add('selected');
+                            }
+                        });
+                        
+                        updateOrder();
+                        
+                        // 显示结果
+                        const orderContent = selectedItems.map(item => `
+                            <div class="flex items-center mb-3">
+                                <div class="w-8 h-8 bg-primary bg-opacity-20 rounded-full flex items-center justify-center mr-3">
+                                    <i class="fa fa-heart text-primary"></i>
+                                </div>
+                                <span>${item.name}</span>
+                            </div>
+                        `).join('');
+                        
+                        resultContent.innerHTML = `
+                            <div class="mb-4">
+                                <h4 class="font-medium text-dark mb-2">互动清单：</h4>
+                                ${orderContent}
+                            </div>
+                            ${orderData.quote ? `
+                                <div class="bg-light p-4 rounded-lg">
+                                    <p class="text-gray-700 italic">"${orderData.quote}"</p>
+                                    <p class="text-right text-sm text-gray-500 mt-2">— ${orderData.author}</p>
+                                </div>
+                            ` : ''}
+                            <div class="mt-4 text-center">
+                                <span class="text-xl font-bold text-primary">总心动值：${totalPrice}</span>
+                            </div>
+                        `;
+                        
+                        shareLinkEl.value = window.location.href;
+                        resultModal.classList.remove('hidden');
+                    } catch (error) {
+                        console.error('Failed to parse order:', error);
+                    }
+                }
+            }
+
+            // 初始化
+            loadWelcomeMessage();
+            // loadWeather(); // 需要API密钥
+            checkShareLink();
+        });
+    </script>
 </body>
 </html>
